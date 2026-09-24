@@ -7,6 +7,8 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Appointments;
+use App\Models\Vehicle;
 
 class User extends Authenticatable
 {
@@ -21,8 +23,9 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
-        'rol',
+        'rol'
     ];
 
     /**
@@ -46,5 +49,20 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class,'user_id');
+    }
+
+    public function assignedAppointments()
+    {
+        return $this->hasMany(Appointment::class,'mechanic_id');
+    }
+
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicle::class);
     }
 }
