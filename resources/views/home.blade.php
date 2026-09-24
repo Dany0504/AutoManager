@@ -196,6 +196,8 @@
             cursor: pointer;
         }
 
+        
+
         /* ================= RESPONSIVE ================= */
 
 @media (max-width: 992px) {
@@ -347,6 +349,8 @@
     border:none;
     border-top:1px solid #ddd;
 }
+
+
     </style>
 </head>
 

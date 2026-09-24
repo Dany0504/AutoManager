@@ -17,15 +17,27 @@ class AppointmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
 {
-    $appointments = Appointment::with([
-        'client',
-        'vehicle',
-        'mechanic'
-    ])->get();
+    $buscar = $request->buscar;
 
-    return view('admin.citas.index', compact('appointments'));
+    $appointments = Appointment::with(['client','vehicle','mechanic'])
+        ->when($buscar, function($query) use ($buscar){
+
+            $query->where('folio','like',"%{$buscar}%")
+                ->orWhereHas('client', function($q) use ($buscar){
+                        $q->where('name','like',"%{$buscar}%");
+                })
+                ->orWhereHas('vehicle', function($q) use ($buscar){
+                        $q->where('brand','like',"%{$buscar}%")
+                    ->orWhere('model','like',"%{$buscar}%");
+                });
+
+        })
+        ->latest()
+        ->get();
+
+    return view('admin.citas.index', compact('appointments','buscar'));
 }
 
     /**
@@ -108,11 +120,13 @@ class AppointmentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Appointment $appointment)
-    {
-        //
-    }
+    public function destroy(Appointment $cita)
+{
+    $cita->delete();
 
+    return redirect()->route('citas.index')
+        ->with('success', 'Cita eliminada correctamente.');
+}
 
 public function getClientData(Client $client)
 {

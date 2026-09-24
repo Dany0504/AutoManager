@@ -1,13 +1,69 @@
 <x-layouts.app title="Configuración de Citas">
 
+<style>
+    .btn-eliminar {
+        background-color: #ff0000;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .btn-eliminar:hover {
+        background-color: #c53030;
+    }
+</style>
+
 <div class="bg-white rounded-xl shadow">
 
 <div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
 
-<input
-type="text"
-placeholder="Buscar cliente o vehículo..."
-class="border rounded-xl px-4 py-3 w-full md:w-80">
+<form method="GET" id="searchForm" class="mb-5">
+
+    <input
+        id="searchInput"
+        type="text"
+        name="buscar"
+        value="{{ $buscar }}"
+        placeholder="Buscar por folio, cliente o vehículo..."
+        class="border rounded-lg px-4 py-2 w-80">
+
+</form>
+<script>
+let timer;
+
+const input = document.getElementById('searchInput');
+
+input.addEventListener('input', () => {
+
+    clearTimeout(timer);
+
+    timer = setTimeout(async () => {
+
+        const url = `{{ route('citas.index') }}?buscar=${encodeURIComponent(input.value)}`;
+
+        const response = await fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const html = await response.text();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        document.getElementById('tablaCitas').innerHTML =
+            doc.getElementById('tablaCitas').innerHTML;
+
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+
+    }, 300);
+
+});
+</script>
 
 <a href="{{ route('citas.create') }}"
 class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-semibold text-center">
@@ -28,8 +84,8 @@ Nueva Cita
 
 @endif
 
-<div class="overflow-x-auto">
-
+<div  class="overflow-x-auto">
+<div id ="tablaCitas">
 <table class="w-full">
 
 <thead class="bg-black text-white">
@@ -79,17 +135,17 @@ Editar
 
 </a>
 
-<form action="{{ route('citas.destroy',$appointment) }}"
-method="POST">
+<form action="{{ route('citas.destroy', $appointment) }}"
+      method="POST"
+      onsubmit="return confirm('¿Eliminar esta cita?')"
+      style="display:inline;">
 
-@csrf
-@method('DELETE')
+    @csrf
+    @method('DELETE')
 
-<button class="bg-red-600 text-white px-3 py-1 rounded">
-
-Eliminar
-
-</button>
+    <button type="submit" class="btn-eliminar">
+        Eliminar
+    </button>
 
 </form>
 
@@ -114,6 +170,7 @@ No hay citas registradas.
 </tbody>
 
 </table>
+</div>
 
 </div>
 

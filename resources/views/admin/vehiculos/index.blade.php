@@ -1,5 +1,20 @@
 <x-layouts.app title="Gestión de Vehículos">
 
+<style>
+    .btn-eliminar {
+        background-color: #ff0000;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .btn-eliminar:hover {
+        background-color: #c53030;
+    }
+</style>
+
 <div class="bg-white rounded-2xl shadow-lg p-6">
 
     @if(session('success'))
@@ -10,10 +25,52 @@
 
     <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
 
-        <input
-            type="text"
-            placeholder="Buscar vehículo..."
-            class="w-full md:w-96 border border-gray-300 rounded-xl px-4 py-3">
+        <form method="GET" id="searchForm" class="mb-5">
+
+    <input
+        id="searchInput"
+        type="text"
+        name="buscar"
+        value="{{ $buscar }}"
+        placeholder="Buscar marca, modelo, año o cliente..."
+        class="border rounded-lg px-4 py-2 w-80">
+
+</form>
+
+<script>
+let timer;
+
+const input = document.getElementById('searchInput');
+
+input.addEventListener('input', () => {
+
+    clearTimeout(timer);
+
+    timer = setTimeout(async () => {
+
+        const url = `{{ route('vehiculos.index') }}?buscar=${encodeURIComponent(input.value)}`;
+
+        const response = await fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const html = await response.text();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        document.getElementById('tablaVehiculos').innerHTML =
+            doc.getElementById('tablaVehiculos').innerHTML;
+
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+
+    }, 300);
+
+});
+</script>
 
         <a href="{{ route('vehiculos.create') }}"
             class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-semibold">
@@ -25,7 +82,7 @@
     </div>
 
     <div class="overflow-x-auto">
-
+        <div id=tablaVehiculos>
         <table class="w-full">
 
             <thead class="bg-black text-white">
@@ -74,13 +131,19 @@
 
                         </a>
 
-                        <button
-                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg">
+                        <form action="{{ route('vehiculos.destroy', $vehicle) }}"
+      method="POST"
+      onsubmit="return confirm('¿Eliminar este vehículo?')"
+      style="display:inline;">
 
-                            Eliminar
+    @csrf
+    @method('DELETE')
 
-                        </button>
+    <button type="submit" class="btn-eliminar">
+        Eliminar
+    </button>
 
+</form>
                     </td>
 
                 </tr>
@@ -102,7 +165,7 @@
             </tbody>
 
         </table>
-
+        </div>
     </div>
 
 </div>

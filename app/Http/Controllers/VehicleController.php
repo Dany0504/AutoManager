@@ -12,11 +12,24 @@ class VehicleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
 {
-    $vehicles = Vehicle::with('client')->get();
+    $buscar = $request->buscar;
 
-    return view('admin.vehiculos.index', compact('vehicles'));
+    $vehicles = Vehicle::with('client')
+        ->when($buscar, function($query) use ($buscar){
+
+            $query->where('brand','like',"%{$buscar}%")
+                ->orWhere('model','like',"%{$buscar}%")
+                ->orWhere('year','like',"%{$buscar}%")
+                ->orWhereHas('client', function($q) use ($buscar){
+                        $q->where('name','like',"%{$buscar}%");
+                });
+
+        })
+        ->get();
+
+    return view('admin.vehiculos.index', compact('vehicles','buscar'));
 }
 
     /**
@@ -76,10 +89,13 @@ class VehicleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Vehicle $vehicle)
-    {
-        //
-    }
+    public function destroy(Vehicle $vehiculo)
+{
+    $vehiculo->delete();
+
+    return redirect()->route('vehiculos.index')
+        ->with('success', 'Vehículo eliminado correctamente.');
+}
 
     public function storeAjax(Request $request)
 {
