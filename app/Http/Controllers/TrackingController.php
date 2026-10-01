@@ -7,11 +7,6 @@ use Illuminate\Http\Request;
 
 class TrackingController extends Controller
 {
-    public function index()
-    {
-        return view('tracking');
-    }
-
     public function track(Request $request)
     {
         $request->validate([
@@ -19,14 +14,28 @@ class TrackingController extends Controller
         ]);
 
         $appointment = Appointment::with('vehicle')
-            ->where('folio', $request->folio)
+            ->where('folio', trim($request->folio))
             ->first();
 
         if (!$appointment) {
-            return back()->with('error', 'No se encontró ningún vehículo con ese folio.')
-                ->withInput();
+            return response()->json([
+                'message' => 'No se encontró ningún vehículo con ese folio.'
+            ], 404);
         }
 
-        return view('tracking', compact('appointment'));
+        return response()->json([
+            'folio' => $appointment->folio,
+
+            'vehicle' => [
+                'brand' => $appointment->vehicle?->brand,
+                'model' => $appointment->vehicle?->model,
+                'year' => $appointment->vehicle?->year,
+                'plates' => $appointment->vehicle?->plates,
+            ],
+
+            'service_type' => $appointment->service_type,
+            'status' => $appointment->status,
+            'notes' => $appointment->notes,
+        ]);
     }
 }

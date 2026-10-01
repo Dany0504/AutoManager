@@ -349,6 +349,128 @@
     border:none;
     border-top:1px solid #ddd;
 }
+/* ================= RASTREO ================= */
+
+.tracking-modal{
+    width:680px;
+}
+
+.tracking-description{
+    color:#666;
+    margin-bottom:18px;
+}
+
+.tracking-search{
+    display:flex;
+    margin-bottom:20px;
+}
+
+.tracking-search input{
+    margin:0;
+    border-radius:0;
+    height:48px;
+}
+
+.tracking-search button{
+    width:130px;
+    border-radius:0;
+    background:#111;
+}
+
+.tracking-header{
+    border-top:1px solid #ddd;
+    padding-top:18px;
+    margin-top:10px;
+    margin-bottom:25px;
+}
+
+.tracking-folio{
+    display:inline-block;
+    background:#111;
+    color:white;
+    padding:5px 8px;
+    font-weight:bold;
+    font-size:14px;
+    margin-right:8px;
+}
+
+.tracking-vehicle{
+    color:#666;
+}
+
+.timeline{
+    position:relative;
+    margin-left:12px;
+}
+
+.timeline-item{
+    position:relative;
+    display:flex;
+    gap:18px;
+    min-height:90px;
+}
+
+.timeline-item:not(:last-child)::before{
+    content:"";
+    position:absolute;
+    left:14px;
+    top:30px;
+    width:2px;
+    height:calc(100% - 5px);
+    background:#e5e5e5;
+}
+
+.timeline-icon{
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    border:2px solid #ddd;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    z-index:2;
+    font-weight:bold;
+}
+
+.timeline-item.completed .timeline-icon{
+    background:#111;
+    color:white;
+    border-color:#111;
+}
+
+.timeline-item.current .timeline-icon{
+    background:#e11d2e;
+    color:white;
+    border-color:#e11d2e;
+}
+
+.timeline-item.current h4{
+    color:#e11d2e;
+}
+
+.timeline-item.pending{
+    color:#aaa;
+}
+
+.timeline-content h4{
+    margin:3px 0 5px;
+}
+
+.timeline-content p{
+    margin:0;
+    color:#777;
+    font-size:14px;
+}
+
+.tracking-error{
+    background:#fee2e2;
+    color:#991b1b;
+    padding:14px;
+    border-radius:8px;
+    margin-top:15px;
+}
 
 
     </style>
@@ -530,21 +652,36 @@
 
 <div class="modal" id="rastrearModal">
 
-    <div class="contenido-modal">
+    <div class="contenido-modal tracking-modal">
 
         <div class="cabecera">
-
-            <h2>Rastrear Vehículo</h2>
-
+            <h2>Rastrear mi vehículo</h2>
             <span class="cerrar" onclick="cerrar('rastrearModal')">×</span>
-
         </div>
 
         <div class="cuerpo">
 
-            <input placeholder="AM-2026-000123">
+            <p class="tracking-description">
+                Ingresa tu número de folio para consultar el estado de tu vehículo.
+            </p>
 
-            <button>Buscar</button>
+            <form id="trackingForm" class="tracking-search">
+
+                <input
+                    type="text"
+                    id="trackingFolio"
+                    name="folio"
+                    placeholder="Ej. AM-2026-000002"
+                    required
+                >
+
+                <button type="submit">
+                    Rastrear
+                </button>
+
+            </form>
+
+            <div id="trackingResult"></div>
 
         </div>
 
@@ -726,6 +863,170 @@ document.getElementById('publicAppointmentForm').addEventListener('submit', asyn
 
 });
 
+// ================= RASTREAR VEHÍCULO =================
+
+document.getElementById('trackingForm').addEventListener('submit', async function(e){
+
+    e.preventDefault();
+
+    const folio = document.getElementById('trackingFolio').value.trim();
+    const result = document.getElementById('trackingResult');
+
+    result.innerHTML = '<p>Buscando vehículo...</p>';
+
+    try{
+
+        const response = await fetch('{{ route("tracking.search") }}', {
+
+            method:'POST',
+
+            headers:{
+                'Content-Type':'application/json',
+                'X-CSRF-TOKEN':document.querySelector('meta[name="csrf-token"]').content,
+                'Accept':'application/json'
+            },
+
+            body:JSON.stringify({
+                folio:folio
+            })
+
+        });
+
+        const data = await response.json();
+
+        if(!response.ok){
+
+            result.innerHTML = `
+                <div class="tracking-error">
+                    No se encontró ningún vehículo con ese folio.
+                </div>
+            `;
+
+            return;
+        }
+
+        const steps = [
+            {
+                key:'pendiente',
+                title:'Recepción',
+                description:'Vehículo recibido en taller'
+            },
+            {
+                key:'diagnostico',
+                title:'Diagnóstico',
+                description:'Revisión inicial del vehículo'
+            },
+            {
+                key:'en_proceso',
+                title:'En proceso',
+                description:'Servicio y reparación en proceso'
+            },
+            {
+                key:'control_calidad',
+                title:'Control de calidad',
+                description:'Pruebas y revisión final'
+            },
+            {
+                key:'listo',
+                title:'Listo para entrega',
+                description:'Vehículo disponible para recoger'
+            }
+        ];
+
+        let currentStatus = (data.status || 'pendiente')
+            .toLowerCase()
+            .trim()
+            .replaceAll(' ', '_');
+
+        let currentIndex = steps.findIndex(step => step.key === currentStatus);
+
+        if(currentIndex === -1){
+            currentIndex = 0;
+        }
+
+        let timelineHTML = '';
+
+        steps.forEach((step, index) => {
+
+            let state = 'pending';
+            let icon = '';
+
+            if(index < currentIndex){
+                state = 'completed';
+                icon = '✓';
+            }
+
+            if(index === currentIndex){
+                state = 'current';
+                icon = '•';
+            }
+
+            timelineHTML += `
+                <div class="timeline-item ${state}">
+
+                    <div class="timeline-icon">
+                        ${icon}
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <h4>${step.title}</h4>
+
+                        <p>${step.description}</p>
+
+                        ${
+                            index === currentIndex && data.notes
+                            ? `<p><strong>${data.notes}</strong></p>`
+                            : ''
+                        }
+
+                    </div>
+
+                </div>
+            `;
+        });
+
+        const plates = data.vehicle.plates
+            ? ` · Placas ${data.vehicle.plates}`
+            : '';
+
+        result.innerHTML = `
+
+            <div class="tracking-header">
+
+                <span class="tracking-folio">
+                    ${data.folio}
+                </span>
+
+                <span class="tracking-vehicle">
+                    ${data.vehicle.brand}
+                    ${data.vehicle.model}
+                    ${data.vehicle.year}
+                    ${plates}
+                </span>
+
+            </div>
+
+            <div class="timeline">
+
+                ${timelineHTML}
+
+            </div>
+        `;
+
+    }catch(error){
+
+        console.error(error);
+
+        result.innerHTML = `
+            <div class="tracking-error">
+                Error al conectar con el servidor.
+            </div>
+        `;
+
+    }
+
+});
 
 </script>
 <div class="modal" id="successModal">
