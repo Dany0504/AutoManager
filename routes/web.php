@@ -3,6 +3,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\TrackingController;
 
 Route::middleware(['auth','role:administrador'])->group(function () {
 
@@ -38,7 +39,13 @@ Route::middleware(['auth','role:administrador'])->group(function () {
 
     Route::get('/catalog/motores/{year}/{brand}/{model}',
     [VehicleController::class,'getEngines']);
+    
+    Route::get('/rastrear', [TrackingController::class, 'index'])
+    ->name('tracking.index');
 
+    Route::post('/rastrear', [TrackingController::class, 'track'])
+    ->name('tracking.search');
+    
 Route::get('/', function () {
     return view('home');
 });
