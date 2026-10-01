@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\ClientVehicleController;
+use App\Http\Controllers\AdminDashboardController;
 
 Route::middleware(['auth','role:administrador'])->group(function () {
 
@@ -93,9 +94,8 @@ Route::get('/mecanico', function () {
     return view('mecanico.dashboard');
 })->middleware(['auth', 'role:mecanico']);
 
-Route::get('/admin', function () {
-    return view('admin.dashboard');
-})->middleware(['auth', 'role:administrador']);
+Route::get('/admin', [AdminDashboardController::class, 'index'])
+    ->middleware(['auth', 'role:administrador']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -665,7 +665,7 @@ vehicleSelect.addEventListener('change', actualizarKilometraje);
 
 
 
-window\.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', async () => {
 
 
 
@@ -841,23 +841,13 @@ window\.addEventListener('DOMContentLoaded', async () => {
 
 
 
-                    <select id="brandSelect"
-
-                            name="brand"
-
-                            required
-
-                            disabled
-
-                            class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
-
-
-
-                        <option value="">Primero selecciona el año</option>
-
-
-
-                    </select>
+                    <input
+                    type="text"
+                    id="brandSelect"
+                    name="brand"
+                    required
+                    placeholder="Ej. Toyota"
+                    class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
 
 
 
@@ -877,27 +867,13 @@ window\.addEventListener('DOMContentLoaded', async () => {
 
                     </label>
 
-
-
-                    <select id="modelSelect"
-
-                            name="model"
-
-                            required
-
-                            disabled
-
-                            class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
-
-
-
-                        <option value="">Primero selecciona la marca</option>
-
-
-
-                    </select>
-
-
+                    <input
+                        type="text"
+                        id="modelSelect"
+                        name="model"
+                        required
+                        placeholder="Ej. Corolla"
+                        class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
 
                 </div>
 
@@ -916,34 +892,19 @@ window\.addEventListener('DOMContentLoaded', async () => {
                     </label>
 
 
-
-                    <select id="engineSelect"
-
-                            name="engine"
-
-                            required
-
-                            disabled
-
-                            class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
-
-
-
-                        <option value="">Primero selecciona el modelo</option>
-
-
-
-                    </select>
+                    <input
+                    type="text"
+                    id="engineSelect"
+                    name="engine"
+                    required
+                    placeholder="Ej. 1.8L"
+                    class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
 
 
 
                 </div>
 
-
-
                 <!-- Color -->
-
-
 
                 <div>
 
@@ -1197,24 +1158,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         form.reset();
 
-
-
-        brandSelect.innerHTML = '<option value="">Primero selecciona el año</option>';
-
-        modelSelect.innerHTML = '<option value="">Primero selecciona la marca</option>';
-
-        engineSelect.innerHTML = '<option value="">Primero selecciona el modelo</option>';
-
-
-
-        brandSelect.disabled = true;
-
-        modelSelect.disabled = true;
-
-        engineSelect.disabled = true;
-
-
-
     }
 
 
@@ -1232,7 +1175,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-
+/*
     // ================= AÑO -> MARCAS =================
 
 
@@ -1380,7 +1323,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-
+*/
     // ================= GUARDAR =================
 
 

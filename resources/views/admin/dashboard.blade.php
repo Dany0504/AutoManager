@@ -4,7 +4,7 @@
 
     <x-stat-card
 title="Citas Hoy"
-value="12"
+:value="$citasHoy"
 :icon='<<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 11h14M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -13,7 +13,7 @@ SVG'/>
 
     <x-stat-card
 title="Vehículos"
-value="58"
+:value="$totalVehiculos"
 :icon='<<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L9 7m6 6l4-4l-4-4"/>
