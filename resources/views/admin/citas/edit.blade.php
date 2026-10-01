@@ -26,29 +26,29 @@
 
 
 
-    <h2 class="text-3xl font-bold">
+    <h2 class="text-3xl font-bold">
 
-        Datos del Cliente
+        Datos del Cliente
 
-    </h2>
-
-
-
-    <button
-
-        type="button"
-
-        id="openClientModal"
-
-        class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl font-semibold">
+    </h2>
 
 
 
-        + Nuevo Cliente
+    <button
+
+        type="button"
+
+        id="openClientModal"
+
+        class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl font-semibold">
 
 
 
-    </button>
+        + Nuevo Cliente
+
+
+
+    </button>
 
 
 
@@ -64,9 +64,9 @@
 
 <select id="clientSelect"
 
-        name="client_id"
+        name="client_id"
 
-        class="w-full border rounded-xl p-3">
+        class="w-full border rounded-xl p-3">
 
 
 
@@ -76,13 +76,13 @@
 
 <option
 
-    value="{{ $client->id }}"
+    value="{{ $client->id }}"
 
-    @selected(old('client_id', $cita->client_id) == $client->id)
+    @selected(old('client_id', $cita->client_id) == $client->id)
 
 >
 
-    {{ $client->name }}
+    {{ $client->name }}
 
 </option>
 
@@ -154,9 +154,9 @@ Datos del Vehículo
 
 <select id="vehicleSelect"
 
-        name="vehicle_id"
+        name="vehicle_id"
 
-        class="w-full border rounded-xl p-3">
+        class="w-full border rounded-xl p-3">
 
 
 
@@ -174,7 +174,7 @@ Selecciona un vehículo
 
 <p id="vehicleMessage"
 
-    class="text-sm text-red-600 mt-2 hidden">
+    class="text-sm text-red-600 mt-2 hidden">
 
 
 
@@ -188,22 +188,14 @@ Este cliente no tiene vehículos registrados.
 
 
 
-<div class="flex items-end md:justify-end">
+<div class="flex items-end">
 
 <button
-
     type="button"
-
     id="openVehicleModal"
+    class="bg-black hover:bg-gray-900 text-white px-6 py-3 rounded-xl font-semibold transition">
 
-    class="bg-black hover:bg-gray-900 text-white px-6 py-3 rounded-xl font-semibold transition"
-    style="width:auto; white-space:nowrap;">
-
-
-
-    + Registrar Vehículo
-
-
+    + Registrar Vehículo
 
 </button>
 
@@ -275,93 +267,93 @@ Servicio
 
 
 
-    <option value="Mantenimiento general"
+    <option value="Mantenimiento general"
 
-        @selected(old('service_type', $cita->service_type) == 'Mantenimiento general')>
+        @selected(old('service_type', $cita->service_type) == 'Mantenimiento general')>
 
-        Mantenimiento general
+        Mantenimiento general
 
-    </option>
-
-
-
-    <option value="Diagnóstico"
-
-        @selected(old('service_type', $cita->service_type) == 'Diagnóstico')>
-
-        Diagnóstico
-
-    </option>
+    </option>
 
 
 
-    <option value="Cambio de aceite"
+    <option value="Diagnóstico"
 
-        @selected(old('service_type', $cita->service_type) == 'Cambio de aceite')>
+        @selected(old('service_type', $cita->service_type) == 'Diagnóstico')>
 
-        Cambio de aceite
+        Diagnóstico
 
-    </option>
-
-
-
-    <option value="Frenos"
-
-        @selected(old('service_type', $cita->service_type) == 'Frenos')>
-
-        Frenos
-
-    </option>
+    </option>
 
 
 
-    <option value="Suspensión"
+    <option value="Cambio de aceite"
 
-        @selected(old('service_type', $cita->service_type) == 'Suspensión')>
+        @selected(old('service_type', $cita->service_type) == 'Cambio de aceite')>
 
-        Suspensión
+        Cambio de aceite
 
-    </option>
-
-
-
-    <option value="Motor"
-
-        @selected(old('service_type', $cita->service_type) == 'Motor')>
-
-        Motor
-
-    </option>
+    </option>
 
 
 
-    <option value="Transmisión"
+    <option value="Frenos"
 
-        @selected(old('service_type', $cita->service_type) == 'Transmisión')>
+        @selected(old('service_type', $cita->service_type) == 'Frenos')>
 
-        Transmisión
+        Frenos
 
-    </option>
-
-
-
-    <option value="Eléctrico"
-
-        @selected(old('service_type', $cita->service_type) == 'Eléctrico')>
-
-        Eléctrico
-
-    </option>
+    </option>
 
 
 
-    <option value="Otro"
+    <option value="Suspensión"
 
-        @selected(old('service_type', $cita->service_type) == 'Otro')>
+        @selected(old('service_type', $cita->service_type) == 'Suspensión')>
 
-        Otro
+        Suspensión
 
-    </option>
+    </option>
+
+
+
+    <option value="Motor"
+
+        @selected(old('service_type', $cita->service_type) == 'Motor')>
+
+        Motor
+
+    </option>
+
+
+
+    <option value="Transmisión"
+
+        @selected(old('service_type', $cita->service_type) == 'Transmisión')>
+
+        Transmisión
+
+    </option>
+
+
+
+    <option value="Eléctrico"
+
+        @selected(old('service_type', $cita->service_type) == 'Eléctrico')>
+
+        Eléctrico
+
+    </option>
+
+
+
+    <option value="Otro"
+
+        @selected(old('service_type', $cita->service_type) == 'Otro')>
+
+        Otro
+
+    </option>
 
 
 
@@ -535,97 +527,97 @@ async function loadClientData(id, selectedVehicleId = null){
 
 
 
-    if(!id){
+    if(!id){
 
-        return;
+        return;
 
-    }
-
-
-
-    const response = await fetch(`/admin/clientes/${id}/vehiculos`);
+    }
 
 
 
-    const data = await response.json();
+    const response = await fetch(`/admin/clientes/${id}/vehiculos`);
 
 
 
-    phoneInput.value = data.phone ?? '';
+    const data = await response.json();
 
 
 
-    currentVehicles = data.vehicles;
+    phoneInput.value = data.phone ?? '';
 
 
 
-    vehicleSelect.innerHTML =
-
-        '<option value="">Selecciona un vehículo</option>';
+    currentVehicles = data.vehicles;
 
 
 
-    if(data.vehicles.length === 0){
+    vehicleSelect.innerHTML =
+
+        '<option value="">Selecciona un vehículo</option>';
 
 
 
-        vehicleMessage.classList.remove('hidden');
-
-        mileageInput.value = '';
+    if(data.vehicles.length === 0){
 
 
 
-        return;
+        vehicleMessage.classList.remove('hidden');
 
-    }
-
-
-
-    vehicleMessage.classList.add('hidden');
+        mileageInput.value = '';
 
 
 
-    data.vehicles.forEach(vehicle => {
+        return;
+
+    }
 
 
 
-        const option = document.createElement('option');
+    vehicleMessage.classList.add('hidden');
 
 
 
-        option.value = vehicle.id;
+    data.vehicles.forEach(vehicle => {
 
 
 
-        option.textContent =
-
-            `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
+        const option = document.createElement('option');
 
 
 
-        if(
-
-            selectedVehicleId &&
-
-            String(vehicle.id) === String(selectedVehicleId)
-
-        ){
-
-            option.selected = true;
-
-        }
+        option.value = vehicle.id;
 
 
 
-        vehicleSelect.appendChild(option);
+        option.textContent =
+
+            `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
 
 
 
-    });
+        if(
+
+            selectedVehicleId &&
+
+            String(vehicle.id) === String(selectedVehicleId)
+
+        ){
+
+            option.selected = true;
+
+        }
 
 
 
-    actualizarKilometraje();
+        vehicleSelect.appendChild(option);
+
+
+
+    });
+
+
+
+    actualizarKilometraje();
 
 
 
@@ -637,15 +629,15 @@ function actualizarKilometraje(){
 
 
 
-    const vehicle = currentVehicles.find(
+    const vehicle = currentVehicles.find(
 
-        vehicle => String(vehicle.id) === String(vehicleSelect.value)
+        vehicle => String(vehicle.id) === String(vehicleSelect.value)
 
-    );
+    );
 
 
 
-    mileageInput.value = vehicle?.mileage ?? '';
+    mileageInput.value = vehicle?.mileage ?? '';
 
 
 
@@ -657,11 +649,11 @@ clientSelect.addEventListener('change', async () => {
 
 
 
-    mileageInput.value = '';
+    mileageInput.value = '';
 
 
 
-    await loadClientData(clientSelect.value);
+    await loadClientData(clientSelect.value);
 
 
 
@@ -673,31 +665,33 @@ vehicleSelect.addEventListener('change', actualizarKilometraje);
 
 
 
-window.addEventListener('DOMContentLoaded', async () => {
+window\.addEventListener('DOMContentLoaded', async () => {
 
 
 
-    if(clientSelect.value){
+    if(clientSelect.value){
 
 
 
-        await loadClientData(
+        await loadClientData(
 
-            clientSelect.value,
+            clientSelect.value,
 
-            initialVehicleId
+            initialVehicleId
 
-        );
+        );
 
 
 
-    }
+    }
 
 
 
 });
 
 
+
+</script>
 
 </script>
 
@@ -713,332 +707,403 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 <div id="vehicleModal"
 
-     class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50">
+     class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50">
 
 
 
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
 
 
 
-        <!-- Encabezado -->
+        <!-- Encabezado -->
 
 
 
-        <div class="bg-black px-8 py-6 flex justify-between items-center">
+        <div class="bg-black px-8 py-6 flex justify-between items-center">
 
 
 
-            <div>
+            <div>
 
-                <h2 class="text-3xl font-bold text-white">
+                <h2 class="text-3xl font-bold text-white">
 
-                    Registrar Vehículo
+                    Registrar Vehículo
 
-                </h2>
+                </h2>
 
 
 
-                <p class="text-gray-400 text-sm">
+                <p class="text-gray-400 text-sm">
 
-                    Agrega un vehículo al cliente seleccionado.
+                    Agrega un vehículo al cliente seleccionado.
 
-                </p>
+                </p>
 
-            </div>
+            </div>
 
 
 
-            <button id="closeVehicleModal"
+            <button id="closeVehicleModal"
 
-                    type="button"
+                    type="button"
 
-                    class="text-white text-3xl hover:text-red-500 transition">
+                    class="text-white text-3xl hover:text-red-500 transition">
 
-                ×
+                ×
 
-            </button>
+            </button>
 
 
 
-        </div>
+        </div>
 
 
 
-        <!-- Formulario -->
+        <!-- Formulario -->
 
 
 
-        <form id="newVehicleForm" class="p-8 space-y-5">
+        <form id="newVehicleForm" class="p-8 space-y-5">
 
 
 
-            @csrf
+            @csrf
 
 
 
-            <input type="hidden"
+            <input type="hidden"
 
-                   id="vehicleClientId"
+                   id="vehicleClientId"
 
-                   name="client_id">
+                   name="client_id">
 
 
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
 
 
-                <!-- Año -->
+                <!-- Año -->
 
 
 
-                <div>
+                <div>
 
-                    <label class="block mb-2 font-semibold text-gray-700">
+                    <label class="block mb-2 font-semibold text-gray-700">
 
-                        Año
+                        Año
 
-                    </label>
+                    </label>
 
 
 
-                    <select id="yearSelect"
+                    <select id="yearSelect"
 
-                            name="year"
+                            name="year"
 
-                            required
+                            required
 
-                            class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
+                            class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
 
 
 
-                        <option value="">Selecciona un año</option>
+                        <option value="">Selecciona un año</option>
 
 
 
-                        @for($year=date('Y');$year>=1995;$year--)
+                        @for($year=date('Y');$year>=1995;$year--)
 
-                            <option value="{{ $year }}">{{ $year }}</option>
+                            <option value="{{ $year }}">{{ $year }}</option>
 
-                        @endfor
+                        @endfor
 
 
 
-                    </select>
+                    </select>
 
 
 
-                </div>
+                </div>
+
+
 
                 <!-- Marca -->
 
+
+
                 <div>
+
                     <label class="block mb-2 font-semibold text-gray-700">
+
                         Marca
+
                     </label>
 
-                    <input type="text"
-                           id="brandSelect"
-                           name="brand"
-                           required
-                           placeholder="Ej. Mazda"
-                           class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
+
+
+                    <select id="brandSelect"
+
+                            name="brand"
+
+                            required
+
+                            disabled
+
+                            class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
+
+
+
+                        <option value="">Primero selecciona el año</option>
+
+
+
+                    </select>
+
+
+
                 </div>
+
+
 
                 <!-- Modelo -->
 
+
+
                 <div>
+
                     <label class="block mb-2 font-semibold text-gray-700">
+
                         Modelo
+
                     </label>
 
-                    <input type="text"
-                           id="modelSelect"
-                           name="model"
-                           required
-                           placeholder="Ej. Mazda 6"
-                           class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
+
+
+                    <select id="modelSelect"
+
+                            name="model"
+
+                            required
+
+                            disabled
+
+                            class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
+
+
+
+                        <option value="">Primero selecciona la marca</option>
+
+
+
+                    </select>
+
+
+
                 </div>
+
+
 
                 <!-- Motor -->
 
+
+
                 <div>
+
                     <label class="block mb-2 font-semibold text-gray-700">
+
                         Motor
+
                     </label>
 
-                    <input type="text"
-                           id="engineSelect"
-                           name="engine"
-                           required
-                           placeholder="Ej. 2.5L"
-                           class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
+
+
+                    <select id="engineSelect"
+
+                            name="engine"
+
+                            required
+
+                            disabled
+
+                            class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
+
+
+
+                        <option value="">Primero selecciona el modelo</option>
+
+
+
+                    </select>
+
+
+
                 </div>
+
+
 
                 <!-- Color -->
 
 
 
-                <div>
+                <div>
 
-                    <label class="block mb-2 font-semibold text-gray-700">
+                    <label class="block mb-2 font-semibold text-gray-700">
 
-                        Color
+                        Color
 
-                    </label>
+                    </label>
 
 
 
-                    <input type="text"
+                    <input type="text"
 
-                           name="color"
+                           name="color"
 
-                           required
+                           required
 
-                           placeholder="Ej. Azul"
+                           placeholder="Ej. Azul"
 
-                           class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
+                           class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
 
 
 
-                </div>
+                </div>
 
 
 
-                <!-- Kilometraje -->
+                <!-- Kilometraje -->
 
 
 
-                <div>
+                <div>
 
-                    <label class="block mb-2 font-semibold text-gray-700">
+                    <label class="block mb-2 font-semibold text-gray-700">
 
-                        Kilometraje
+                        Kilometraje
 
-                    </label>
+                    </label>
 
 
 
-                    <input type="number"
+                    <input type="number"
 
-                           name="mileage"
+                           name="mileage"
 
-                           required
+                           required
 
-                           placeholder="258000"
+                           placeholder="258000"
 
-                           class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
+                           class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
 
 
 
-                </div>
+                </div>
 
 
 
-            </div>
+            </div>
 
 
 
-            <!-- Placas -->
+            <!-- Placas -->
 
 
 
-            <div>
+            <div>
 
-                <label class="block mb-2 font-semibold text-gray-700">
+                <label class="block mb-2 font-semibold text-gray-700">
 
-                    Placas
+                    Placas
 
-                </label>
+                </label>
 
 
 
-                <input type="text"
+                <input type="text"
 
-                       name="plates"
+                       name="plates"
 
-                       placeholder="WEJ117"
+                       placeholder="WEJ117"
 
-                       class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
+                       class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
 
-            </div>
+            </div>
 
 
 
-            <!-- VIN -->
+            <!-- VIN -->
 
 
 
-            <div>
+            <div>
 
-                <label class="block mb-2 font-semibold text-gray-700">
+                <label class="block mb-2 font-semibold text-gray-700">
 
-                    VIN (opcional)
+                    VIN (opcional)
 
-                </label>
+                </label>
 
 
 
-                <input type="text"
+                <input type="text"
 
-                       name="vin"
+                       name="vin"
 
-                       placeholder="1HGCM82633A123456"
+                       placeholder="1HGCM82633A123456"
 
-                       class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
+                       class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
 
-            </div>
+            </div>
 
 
 
-            <!-- Botones -->
+            <!-- Botones -->
 
 
 
-            <div class="flex justify-end gap-3 pt-3">
+            <div class="flex justify-end gap-3 pt-3">
 
 
 
-                <button type="button"
+                <button type="button"
 
-                        id="cancelVehicleModal"
+                        id="cancelVehicleModal"
 
-                        class="px-5 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 font-semibold">
+                        class="px-5 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 font-semibold">
 
 
 
-                    Cancelar
+                    Cancelar
 
 
 
-                </button>
+                </button>
 
 
 
-                <button type="submit"
+                <button type="submit"
 
-                        class="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold shadow-lg">
+                        class="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold shadow-lg">
 
 
 
-                    Guardar Vehículo
+                    Guardar Vehículo
 
 
 
-                </button>
+                </button>
 
 
 
-            </div>
+            </div>
 
 
 
-        </form>
+        </form>
 
 
 
-    </div>
+    </div>
 
 
 
@@ -1054,184 +1119,357 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    const modal = document.getElementById('vehicleModal');
+    const modal = document.getElementById('vehicleModal');
 
-    const open = document.getElementById('openVehicleModal');
+    const open = document.getElementById('openVehicleModal');
 
-    const close = document.getElementById('closeVehicleModal');
+    const close = document.getElementById('closeVehicleModal');
 
-    const cancel = document.getElementById('cancelVehicleModal');
-
-
-
-    const form = document.getElementById('newVehicleForm');
+    const cancel = document.getElementById('cancelVehicleModal');
 
 
 
-    const clientSelect = document.getElementById('clientSelect');
-
-    const vehicleSelect = document.getElementById('vehicleSelect');
+    const form = document.getElementById('newVehicleForm');
 
 
 
-    // Abrir modal
+    const clientSelect = document.getElementById('clientSelect');
+
+    const vehicleSelect = document.getElementById('vehicleSelect');
 
 
 
-    open.addEventListener('click', () => {
+    const yearSelect = document.getElementById('yearSelect');
+
+    const brandSelect = document.getElementById('brandSelect');
+
+    const modelSelect = document.getElementById('modelSelect');
+
+    const engineSelect = document.getElementById('engineSelect');
 
 
 
-        if (!clientSelect.value) {
-
-            alert('Primero selecciona un cliente.');
-
-            return;
-
-        }
+    // Abrir modal
 
 
 
-        document.getElementById('vehicleClientId').value = clientSelect.value;
+    open.addEventListener('click', () => {
 
 
 
-        modal.classList.remove('hidden');
+        if (!clientSelect.value) {
 
-        modal.classList.add('flex');
+            alert('Primero selecciona un cliente.');
 
+            return;
 
-
-    });
-
-
-
-    // Cerrar modal
+        }
 
 
 
-    function cerrarModal() {
+        document.getElementById('vehicleClientId').value = clientSelect.value;
 
 
 
-        modal.classList.add('hidden');
+        modal.classList.remove('hidden');
 
-        modal.classList.remove('flex');
-
-
-
-        form.reset();
+        modal.classList.add('flex');
 
 
 
-    }
+    });
 
 
 
-    close.addEventListener('click', cerrarModal);
-
-    cancel.addEventListener('click', cerrarModal);
+    // Cerrar modal
 
 
 
-    modal.addEventListener('click', function (e) {
+    function cerrarModal() {
 
-        if (e.target === modal) cerrarModal();
 
-    });
+
+        modal.classList.add('hidden');
+
+        modal.classList.remove('flex');
+
+
+
+        form.reset();
+
+
+
+        brandSelect.innerHTML = '<option value="">Primero selecciona el año</option>';
+
+        modelSelect.innerHTML = '<option value="">Primero selecciona la marca</option>';
+
+        engineSelect.innerHTML = '<option value="">Primero selecciona el modelo</option>';
+
+
+
+        brandSelect.disabled = true;
+
+        modelSelect.disabled = true;
+
+        engineSelect.disabled = true;
+
+
+
+    }
+
+
+
+    close.addEventListener('click', cerrarModal);
+
+    cancel.addEventListener('click', cerrarModal);
+
+
+
+    modal.addEventListener('click', function (e) {
+
+        if (e.target === modal) cerrarModal();
+
+    });
+
+
+
+    // ================= AÑO -> MARCAS =================
+
+
+
+    yearSelect.addEventListener('change', async function () {
+
+
+
+        brandSelect.disabled = true;
+
+        modelSelect.disabled = true;
+
+        engineSelect.disabled = true;
+
+
+
+        brandSelect.innerHTML = '<option>Cargando...</option>';
+
+        modelSelect.innerHTML = '<option>Primero selecciona la marca</option>';
+
+        engineSelect.innerHTML = '<option>Primero selecciona el modelo</option>';
+
+
+
+        if (!this.value) return;
+
+
+
+        const brands = await fetch(`/catalog/marcas/${this.value}`)
+
+            .then(r => r.json());
+
+
+
+        brandSelect.innerHTML = '<option value="">Selecciona una marca</option>';
+
+
+
+        brands.forEach(brand => {
+
+            brandSelect.innerHTML += `<option value="${brand}">${brand}</option>`;
+
+        });
+
+
+
+        brandSelect.disabled = false;
+
+
+
+    });
+
+
+
+    // ================= MARCA -> MODELOS =================
+
+
+
+    brandSelect.addEventListener('change', async function () {
+
+
+
+        modelSelect.disabled = true;
+
+        engineSelect.disabled = true;
+
+
+
+        modelSelect.innerHTML = '<option>Cargando...</option>';
+
+        engineSelect.innerHTML = '<option>Primero selecciona el modelo</option>';
+
+
+
+        if (!this.value) return;
+
+
+
+        const models = await fetch(`/catalog/modelos/${yearSelect.value}/${encodeURIComponent(this.value)}`)
+
+            .then(r => r.json());
+
+
+
+        modelSelect.innerHTML = '<option value="">Selecciona un modelo</option>';
+
+
+
+        models.forEach(model => {
+
+            modelSelect.innerHTML += `<option value="${model}">${model}</option>`;
+
+        });
+
+
+
+        modelSelect.disabled = false;
+
+
+
+    });
+
+
+
+    // ================= MODELO -> MOTORES =================
+
+
+
+    modelSelect.addEventListener('change', async function () {
+
+
+
+        engineSelect.disabled = true;
+
+        engineSelect.innerHTML = '<option>Cargando...</option>';
+
+
+
+        if (!this.value) return;
+
+
+
+        const engines = await fetch(`/catalog/motores/${yearSelect.value}/${encodeURIComponent(brandSelect.value)}/${encodeURIComponent(this.value)}`)
+
+            .then(r => r.json());
+
+
+
+        engineSelect.innerHTML = '<option value="">Selecciona un motor</option>';
+
+
+
+        engines.forEach(engine => {
+
+            engineSelect.innerHTML += `<option value="${engine}">${engine}</option>`;
+
+        });
+
+
+
+        engineSelect.disabled = false;
+
+
+
+    });
+
+
 
     // ================= GUARDAR =================
 
 
 
-    form.addEventListener('submit', async function (e) {
+    form.addEventListener('submit', async function (e) {
 
 
 
-    e.preventDefault();
+    e.preventDefault();
 
 
 
-    try {
+    try {
 
 
 
-        const data = new FormData(form);
+        const data = new FormData(form);
 
 
 
-        const response = await fetch('/admin/vehiculos/ajax', {
+        const response = await fetch('/admin/vehiculos/ajax', {
 
 
 
-            method: 'POST',
+            method: 'POST',
 
 
 
-            headers: {
+            headers: {
 
-                'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
 
-                'Accept': 'application/json'
+                'Accept': 'application/json'
 
-            },
-
-
-
-            body: data
+            },
 
 
 
-        });
+            body: data
 
 
 
-        const result = await response.json();
+        });
 
 
 
-        if (!response.ok) {
-
-            console.error(result);
-
-            alert('Error al guardar el vehículo.');
-
-            return;
-
-        }
+        const result = await response.json();
 
 
 
-        const texto = `${result.vehicle.brand} ${result.vehicle.model} (${result.vehicle.year})`;
+        if (!response.ok) {
+
+            console.error(result);
+
+            alert('Error al guardar el vehículo.');
+
+            return;
+
+        }
 
 
 
-        vehicleSelect.appendChild(
-
-            new Option(texto, result.vehicle.id, true, true)
-
-        );
-
-        currentVehicles.push(result.vehicle);
-        mileageInput.value = result.vehicle.mileage ?? '';
+        const texto = `${result.vehicle.brand} ${result.vehicle.model} (${result.vehicle.year})`;
 
 
 
-        cerrarModal();
+        vehicleSelect.appendChild(
+
+            new Option(texto, result.vehicle.id, true, true)
+
+        );
 
 
 
-    } catch (error) {
+        cerrarModal();
 
 
 
-        console.error(error);
-
-        alert('Ocurrió un error. Revisa la consola (F12).');
+    } catch (error) {
 
 
 
-    }
+        console.error(error);
+
+        alert('Ocurrió un error. Revisa la consola (F12).');
+
+
+
+    }
 
 
 
