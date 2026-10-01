@@ -6,265 +6,618 @@ use App\Models\Appointment;
 use App\Models\Client;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
-use App\Models\User;
-
-
 
 class AppointmentController extends Controller
 {
-
-
     /**
-     * Display a listing of the resource.
+     * Mostrar listado de citas.
      */
     public function index(Request $request)
-{
-    $buscar = $request->buscar;
+    {
+        $buscar = $request->buscar;
 
-    $appointments = Appointment::with(['client','vehicle','mechanic'])
-        ->when($buscar, function($query) use ($buscar){
+        $appointments = Appointment::with([
+                'client',
+                'vehicle',
+                'mechanic'
+            ])
+            ->when($buscar, function ($query) use ($buscar) {
 
-            $query->where('folio','like',"%{$buscar}%")
-                ->orWhereHas('client', function($q) use ($buscar){
-                        $q->where('name','like',"%{$buscar}%");
-                })
-                ->orWhereHas('vehicle', function($q) use ($buscar){
-                        $q->where('brand','like',"%{$buscar}%")
-                    ->orWhere('model','like',"%{$buscar}%");
+                $query->where(function ($q) use ($buscar) {
+
+                    $q->where('folio', 'like', "%{$buscar}%")
+
+                        ->orWhereHas('client', function ($clientQuery) use ($buscar) {
+                            $clientQuery->where('name', 'like', "%{$buscar}%");
+                        })
+
+                        ->orWhereHas('vehicle', function ($vehicleQuery) use ($buscar) {
+                            $vehicleQuery
+                                ->where('brand', 'like', "%{$buscar}%")
+                                ->orWhere('model', 'like', "%{$buscar}%");
+                        });
+
                 });
 
-        })
-        ->latest()
-        ->get();
+            })
+            ->latest()
+            ->get();
 
-    return view('admin.citas.index', compact('appointments','buscar'));
-}
+        return view(
+            'admin.citas.index',
+            compact('appointments', 'buscar')
+        );
+    }
+
 
     /**
-     * Show the form for creating a new resource.
+     * Mostrar formulario para crear cita desde Admin.
      */
     public function create()
-{
-    $clients = Client::orderBy('name')->get();
+    {
+        $clients = Client::orderBy('name')->get();
 
-    return view('admin.citas.create', compact('clients'));
-}
+        return view(
+            'admin.citas.create',
+            compact('clients')
+        );
+    }
+
 
     /**
-     * Store a newly created resource in storage.
+     * Guardar cita creada desde Admin.
      */
     public function store(Request $request)
-{
-    $request->validate([
+    {
+        $validated = $request->validate([
 
-        'client_id' => 'required',
+            'client_id' => [
+                'required',
+                'exists:clients,id'
+            ],
 
-        'vehicle_id' => 'required',
+            'vehicle_id' => [
+                'required',
+                'exists:vehicles,id'
+            ],
 
-        'service_type' => 'required',
+            'service_type' => [
+                'required',
+                'string',
+                'max:255'
+            ],
 
-        'appointment_date' => 'required',
+            'appointment_date' => [
+                'required',
+                'date'
+            ],
 
-        'appointment_time' => 'required'
+            'appointment_time' => [
+                'required'
+            ],
 
-    ]);
+            'notes' => [
+                'nullable',
+                'string',
+                'max:1000'
+            ],
 
-    Appointment::create([
+        ]);
 
-        'client_id' => $request->client_id,
 
-        'vehicle_id' => $request->vehicle_id,
+        /*
+         * Comprobar que el vehículo seleccionado
+         * realmente pertenece al cliente.
+         */
+        $vehicle = Vehicle::where('id', $validated['vehicle_id'])
+            ->where('client_id', $validated['client_id'])
+            ->firstOrFail();
 
-        'mechanic_id' => null,
 
-        'service_type' => $request->service_type,
+        $appointment = Appointment::create([
 
-        'appointment_date' => $request->appointment_date,
+            'client_id' => $validated['client_id'],
 
-        'appointment_time' => $request->appointment_time,
+            'vehicle_id' => $vehicle->id,
 
-        'notes' => $request->notes,
+            'mechanic_id' => null,
 
-        'status' => 'pendiente'
+            'service_type' => $validated['service_type'],
 
-    ]);
+            'appointment_date' => $validated['appointment_date'],
 
-    return redirect()->route('citas.index')
-        ->with('success','Cita creada correctamente');
-}
+            'appointment_time' => $validated['appointment_time'],
+
+            'notes' => $validated['notes'] ?? null,
+
+            'status' => 'pendiente',
+
+        ]);
+
+
+        /*
+         * Generar folio usando el ID.
+         *
+         * Ejemplo:
+         * AM-2026-000015
+         */
+        $appointment->folio =
+            'AM-' .
+            now()->format('Y') .
+            '-' .
+            str_pad(
+                $appointment->id,
+                6,
+                '0',
+                STR_PAD_LEFT
+            );
+
+        $appointment->save();
+
+
+        return redirect()
+            ->route('citas.index')
+            ->with(
+                'success',
+                'Cita creada correctamente'
+            );
+    }
+
 
     /**
-     * Display the specified resource.
+     * Mostrar una cita.
      */
     public function show(Appointment $appointment)
     {
         //
     }
 
+
     /**
-     * Show the form for editing the specified resource.
+     * Mostrar formulario para editar cita.
      */
     public function edit(Appointment $cita)
     {
-    $clients = Client::orderBy('name')->get();
+        $clients = Client::orderBy('name')->get();
 
-    $cita->load(['client', 'vehicle', 'mechanic']);
+        $cita->load([
+            'client',
+            'vehicle',
+            'mechanic'
+        ]);
 
-    return view('admin.citas.edit', compact('cita', 'clients'));
+        return view(
+            'admin.citas.edit',
+            compact('cita', 'clients')
+        );
     }
 
+
     /**
-     * Update the specified resource in storage.
+     * Actualizar cita desde Admin.
      */
-    public function update(Request $request, Appointment $cita)
+    public function update(
+        Request $request,
+        Appointment $cita
+    ) {
+        $validated = $request->validate([
+
+            'client_id' => [
+                'required',
+                'exists:clients,id'
+            ],
+
+            'vehicle_id' => [
+                'required',
+                'exists:vehicles,id'
+            ],
+
+            'service_type' => [
+                'required',
+                'string',
+                'max:255'
+            ],
+
+            'appointment_date' => [
+                'required',
+                'date'
+            ],
+
+            'appointment_time' => [
+                'required'
+            ],
+
+            'notes' => [
+                'nullable',
+                'string',
+                'max:1000'
+            ],
+
+            'mileage' => [
+                'nullable',
+                'integer',
+                'min:0'
+            ],
+
+        ]);
+
+
+        /*
+         * Verificar que el vehículo pertenezca
+         * al cliente seleccionado.
+         */
+        $vehicle = Vehicle::where(
+                'id',
+                $validated['vehicle_id']
+            )
+            ->where(
+                'client_id',
+                $validated['client_id']
+            )
+            ->firstOrFail();
+
+
+        /*
+         * Actualizar cita.
+         */
+        $cita->update([
+
+            'client_id' => $validated['client_id'],
+
+            'vehicle_id' => $validated['vehicle_id'],
+
+            'service_type' => $validated['service_type'],
+
+            'appointment_date' => $validated['appointment_date'],
+
+            'appointment_time' => $validated['appointment_time'],
+
+            'notes' => $validated['notes'] ?? null,
+
+        ]);
+
+
+        /*
+         * Actualizar kilometraje del vehículo,
+         * solamente si se recibió.
+         */
+        if ($request->filled('mileage')) {
+
+            $vehicle->update([
+                'mileage' => $validated['mileage']
+            ]);
+
+        }
+
+
+        return redirect()
+            ->route('citas.index')
+            ->with(
+                'success',
+                'Cita actualizada correctamente.'
+            );
+    }
+
+
+    /**
+     * Eliminar cita.
+     */
+    public function destroy(Appointment $cita)
     {
-    $validated = $request->validate([
-        'client_id' => 'required|exists:clients,id',
-        'vehicle_id' => 'required|exists:vehicles,id',
-        'service_type' => 'required|string|max:255',
-        'appointment_date' => 'required|date',
-        'appointment_time' => 'required',
-        'notes' => 'nullable|string',
-        'mileage' => 'nullable|integer|min:0',
-    ]);
+        $cita->delete();
 
-    // Verificar que el vehículo realmente pertenezca al cliente seleccionado
-    $vehicle = Vehicle::where('id', $validated['vehicle_id'])
-        ->where('client_id', $validated['client_id'])
-        ->firstOrFail();
+        return redirect()
+            ->route('citas.index')
+            ->with(
+                'success',
+                'Cita eliminada correctamente.'
+            );
+    }
 
-    $cita->update([
-        'client_id' => $validated['client_id'],
-        'vehicle_id' => $validated['vehicle_id'],
-        'service_type' => $validated['service_type'],
-        'appointment_date' => $validated['appointment_date'],
-        'appointment_time' => $validated['appointment_time'],
-        'notes' => $validated['notes'] ?? null,
-    ]);
 
-    // Actualizar kilometraje del vehículo
-    if ($request->filled('mileage')) {
-        $vehicle->update([
-            'mileage' => $validated['mileage']
+    /**
+     * Obtener información de un cliente
+     * y sus vehículos mediante AJAX.
+     */
+    public function getClientData(Client $client)
+    {
+        return response()->json([
+
+            'phone' => $client->phone,
+
+            'vehicles' => $client
+                ->vehicles()
+                ->get([
+                    'id',
+                    'brand',
+                    'model',
+                    'year',
+                    'mileage'
+                ])
+
         ]);
     }
 
-    return redirect()
-        ->route('citas.index')
-        ->with('success', 'Cita actualizada correctamente.');
-    }   
 
     /**
-     * Remove the specified resource from storage.
+     * Crear cliente mediante AJAX desde Admin.
      */
-    public function destroy(Appointment $cita)
-{
-    $cita->delete();
+    public function storeClientAjax(Request $request)
+    {
+        $validated = $request->validate([
 
-    return redirect()->route('citas.index')
-        ->with('success', 'Cita eliminada correctamente.');
-}
+            'name' => [
+                'required',
+                'string',
+                'max:255'
+            ],
 
-public function getClientData(Client $client)
-{
-    return response()->json([
-        'phone' => $client->phone,
-        'vehicles' => $client->vehicles()->get([
-            'id',
-            'brand',
-            'model',
-            'year',
-            'mileage'
-        ])
-    ]);
-}
+            'phone' => [
+                'required',
+                'string',
+                'max:20'
+            ],
 
-public function storeClientAjax(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'phone' => 'required|string|max:20',
-        'email' => 'nullable|email|max:255'
-    ]);
+            'email' => [
+                'nullable',
+                'email',
+                'max:255'
+            ],
 
-    $client = Client::create([
-        'name' => $request->name,
-        'phone' => $request->phone,
-        'email' => $request->email
-    ]);
+        ]);
 
-    return response()->json([
-        'success' => true,
-        'client' => $client
-    ]);
-}
 
-public function publicStore(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'phone' => 'required|string|max:20',
-        'email' => 'nullable|email',
+        $client = Client::create([
 
-        'brand' => 'required|string',
-        'model' => 'required|string',
-        'year' => 'required|integer',
-        'engine' => 'required|string',
-        'color' => 'required|string',
-        'plates' => 'nullable|string',
-        'mileage' => 'required|numeric',
+            'name' => $validated['name'],
 
-        'appointment_date' => 'required|date',
-        'appointment_time' => 'required',
-        'service_type' => 'required|string',
-        'description' => 'nullable|string'
-    ]);
+            'phone' => $validated['phone'],
 
-    // Crear cliente
-    $client = Client::create([
-        'name' => $request->name,
-        'phone' => $request->phone,
-        'email' => $request->email
-    ]);
+            'email' => $validated['email'] ?? null,
 
-    // Crear vehículo
-    $vehicle = Vehicle::create([
-        'client_id' => $client->id,
-        'brand' => $request->brand,
-        'model' => $request->model,
-        'year' => $request->year,
-        'engine' => $request->engine,
-        'color' => $request->color,
-        'plates' => $request->plates,
-        'mileage' => $request->mileage
-    ]);
+        ]);
 
-    // Crear cita
-    $appointment = Appointment::create([
-        'client_id' => $client->id,
-        'vehicle_id' => $vehicle->id,
-        'mechanic_id' => null,
 
-        'service_type' => $request->service_type,
-        'appointment_date' => $request->appointment_date,
-        'appointment_time' => $request->appointment_time,
+        return response()->json([
 
-        
-        'status' => 'pendiente',
+            'success' => true,
 
-        'notes' => $request->description
-    ]);
+            'client' => $client
 
-    // Generar folio
-    $appointment->folio = 'AM-' . date('Y') . '-' . str_pad($appointment->id, 6, '0', STR_PAD_LEFT);
-    $appointment->save();
+        ]);
+    }
 
-    return response()->json([
-        'success' => true,
-        'folio' => $appointment->folio,
-        'name' => $client->name,
-        'date' => $appointment->appointment_date,
-        'time' => $appointment->appointment_time
-    ]);
-}
+
+    /**
+     * Crear cita desde el formulario público.
+     *
+     * Este método crea:
+     * 1. Cliente
+     * 2. Vehículo
+     * 3. Cita
+     */
+    public function publicStore(Request $request)
+    {
+        $validated = $request->validate([
+
+            /*
+             * CLIENTE
+             */
+            'name' => [
+                'required',
+                'string',
+                'max:255'
+            ],
+
+            'phone' => [
+                'required',
+                'string',
+                'max:20'
+            ],
+
+            'email' => [
+                'nullable',
+                'email',
+                'max:255'
+            ],
+
+
+            /*
+             * VEHÍCULO
+             */
+            'brand' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+
+            'model' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+
+            'year' => [
+                'required',
+                'integer'
+            ],
+
+            'engine' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+
+            'color' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+
+            'plates' => [
+                'nullable',
+                'string',
+                'max:50'
+            ],
+
+            'mileage' => [
+                'required',
+                'numeric',
+                'min:0'
+            ],
+
+
+            /*
+             * CITA
+             */
+            'appointment_date' => [
+                'required',
+                'date'
+            ],
+
+            'appointment_time' => [
+                'required'
+            ],
+
+            'service_type' => [
+                'required',
+                'string',
+                'max:255'
+            ],
+
+
+            /*
+             * OBSERVACIONES / FALLA
+             *
+             * Mantenemos "description" porque el
+             * formulario público actual ya puede
+             * estar enviando ese nombre.
+             */
+            'description' => [
+                'nullable',
+                'string',
+                'max:1000'
+            ],
+
+        ]);
+
+
+        /*
+         * ==============================
+         * CREAR CLIENTE
+         * ==============================
+         */
+
+        $client = Client::create([
+
+            'name' => $validated['name'],
+
+            'phone' => $validated['phone'],
+
+            'email' => $validated['email'] ?? null,
+
+        ]);
+
+
+        /*
+         * ==============================
+         * CREAR VEHÍCULO
+         * ==============================
+         */
+
+        $vehicle = Vehicle::create([
+
+            'client_id' => $client->id,
+
+            'brand' => $validated['brand'],
+
+            'model' => $validated['model'],
+
+            'year' => $validated['year'],
+
+            'engine' => $validated['engine'],
+
+            'color' => $validated['color'],
+
+            'plates' => $validated['plates'] ?? null,
+
+            'mileage' => $validated['mileage'],
+
+        ]);
+
+
+        /*
+         * ==============================
+         * CREAR CITA
+         * ==============================
+         */
+
+        $appointment = Appointment::create([
+
+            'client_id' => $client->id,
+
+            'vehicle_id' => $vehicle->id,
+
+            'mechanic_id' => null,
+
+            'service_type' => $validated['service_type'],
+
+            'appointment_date' =>
+                $validated['appointment_date'],
+
+            'appointment_time' =>
+                $validated['appointment_time'],
+
+            'status' => 'pendiente',
+
+            /*
+             * "description" del formulario
+             * se guarda en la columna "notes"
+             * de appointments.
+             */
+            'notes' => $validated['description'] ?? null,
+
+        ]);
+
+
+        /*
+         * ==============================
+         * GENERAR FOLIO
+         * ==============================
+         */
+
+        $appointment->folio =
+            'AM-' .
+            now()->format('Y') .
+            '-' .
+            str_pad(
+                $appointment->id,
+                6,
+                '0',
+                STR_PAD_LEFT
+            );
+
+        $appointment->save();
+
+
+        /*
+         * ==============================
+         * RESPUESTA
+         * ==============================
+         */
+
+        return response()->json([
+
+            'success' => true,
+
+            'folio' => $appointment->folio,
+
+            'name' => $client->name,
+
+            'date' => $appointment->appointment_date,
+
+            'time' => $appointment->appointment_time,
+
+        ]);
+    }
 }

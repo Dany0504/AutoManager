@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Mis vehículos - AutoManager</title>
 
     <style>
@@ -23,7 +24,10 @@
             min-height: 100vh;
         }
 
-        /* SIDEBAR */
+        /* =========================
+           SIDEBAR
+        ========================== */
+
         .sidebar {
             width: 220px;
             background: #050505;
@@ -96,13 +100,17 @@
             color: #aaa;
             cursor: pointer;
             padding: 0;
+            font-size: 13px;
         }
 
         .logout:hover {
             color: white;
         }
 
-        /* CONTENIDO */
+        /* =========================
+           CONTENIDO
+        ========================== */
+
         .main {
             flex: 1;
         }
@@ -143,7 +151,10 @@
             padding: 32px;
         }
 
-        /* MENSAJES */
+        /* =========================
+           MENSAJES
+        ========================== */
+
         .success {
             padding: 14px;
             background: #e8f6e8;
@@ -162,7 +173,10 @@
             margin-left: 20px;
         }
 
-        /* FORMULARIO */
+        /* =========================
+           FORMULARIO
+        ========================== */
+
         .vehicle-form {
             background: white;
             border: 1px solid #ddd;
@@ -216,31 +230,26 @@
             cursor: pointer;
         }
 
-        /* VEHÍCULOS */
+        /* =========================
+           VEHÍCULOS
+        ========================== */
+
         .vehicle-item {
             background: white;
             border: 1px solid #ddd;
             padding: 25px;
             margin-bottom: 16px;
+
             display: flex;
             align-items: center;
             justify-content: space-between;
+
+            min-height: 100px;
         }
 
         .vehicle-left {
             display: flex;
             align-items: center;
-            gap: 20px;
-        }
-
-        .vehicle-icon {
-            width: 42px;
-            height: 42px;
-            background: #050505;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
         }
 
         .vehicle-name {
@@ -249,19 +258,38 @@
             margin-bottom: 10px;
         }
 
+        /*
+         * Todos los datos utilizan la misma altura,
+         * tipografía y alineación.
+         */
         .vehicle-details {
             display: flex;
-            gap: 22px;
+            align-items: center;
+            gap: 26px;
             flex-wrap: wrap;
-            font-size: 12px;
+
+            font-size: 13px;
             color: #777;
+            line-height: 20px;
         }
 
+        .vehicle-details span {
+            display: inline-flex;
+            align-items: center;
+            height: 20px;
+            padding: 0;
+            margin: 0;
+        }
+
+        /*
+         * La placa ya no tiene cajita gris,
+         * padding especial ni fuente monospace.
+         */
         .plates {
-            background: #f3f3f3;
-            padding: 4px 8px;
-            color: #333;
-            font-family: monospace;
+            background: transparent;
+            padding: 0;
+            color: #777;
+            font-family: Arial, sans-serif;
         }
 
         .edit-link {
@@ -269,6 +297,10 @@
             text-decoration: none;
             font-size: 13px;
             cursor: pointer;
+        }
+
+        .edit-link:hover {
+            text-decoration: underline;
         }
 
         .empty {
@@ -279,7 +311,16 @@
             color: #777;
         }
 
+        .empty p {
+            margin-top: 8px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
         @media (max-width: 800px) {
+
             .sidebar {
                 width: 180px;
             }
@@ -291,6 +332,12 @@
             .vehicle-item {
                 align-items: flex-start;
             }
+
+            .vehicle-details {
+                gap: 12px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -299,46 +346,79 @@
 
 <div class="layout">
 
+    {{-- =========================
+         SIDEBAR
+    ========================== --}}
+
     <aside class="sidebar">
 
         <div class="logo">
-            <div class="logo-title">🔴 AutoManager</div>
+            <div class="logo-title">AutoManager</div>
             <span class="logo-role">Cliente</span>
         </div>
 
         <nav class="menu">
-            <a href="/cliente">Inicio</a>
+
+            <a href="{{ route('cliente.dashboard') }}">
+                Inicio
+            </a>
 
             <a href="{{ route('cliente.vehiculos') }}" class="active">
                 Mis vehículos
             </a>
 
-            <a href="#">Agendar cita</a>
-            <a href="#">Mis citas</a>
-            <a href="#">Rastrear orden</a>
-            <a href="#">Historial</a>
-            <a href="#">Autorizaciones</a>
+            <a href="{{ route('cliente.citas.create') }}">
+                Agendar cita
+            </a>
+
+            <a href="#">
+                Mis citas
+            </a>
+
+            <a href="#">
+                Rastrear orden
+            </a>
+
+            <a href="#">
+                Historial
+            </a>
+
+            <a href="#">
+                Autorizaciones
+            </a>
 
             <a href="{{ route('profile.edit') }}">
                 Perfil
             </a>
+
         </nav>
 
         <div class="session">
-            <div class="session-label">Sesión activa</div>
+
+            <div class="session-label">
+                Sesión activa
+            </div>
+
             <div class="session-name">
                 {{ auth()->user()->name }}
             </div>
 
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
+
                 <button type="submit" class="logout">
-                    ⏻ Cerrar sesión
+                    Cerrar sesión
                 </button>
             </form>
+
         </div>
 
     </aside>
+
+
+    {{-- =========================
+         CONTENIDO PRINCIPAL
+    ========================== --}}
 
     <main class="main">
 
@@ -358,171 +438,276 @@
 
         </header>
 
+
         <section class="content">
 
+            {{-- MENSAJE DE ÉXITO --}}
+
             @if(session('success'))
+
                 <div class="success">
                     {{ session('success') }}
                 </div>
+
             @endif
+
+
+            {{-- ERRORES --}}
 
             @if($errors->any())
+
                 <div class="errors">
+
                     <ul>
+
                         @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
+
+                            <li>
+                                {{ $error }}
+                            </li>
+
                         @endforeach
+
                     </ul>
+
                 </div>
+
             @endif
 
 
-            {{-- FORMULARIO AGREGAR / EDITAR --}}
-<div
-    id="formularioVehiculo"
-    class="vehicle-form"
-    style="{{ isset($vehicle) || $errors->any() ? '' : 'display:none;' }}"
->
+            {{-- =========================
+                 FORMULARIO
+                 AGREGAR / EDITAR
+            ========================== --}}
 
-    <h3>
-        {{ isset($vehicle) ? 'Editar vehículo' : 'Nuevo vehículo' }}
-    </h3>
+            <div
+                id="formularioVehiculo"
+                class="vehicle-form"
+                style="{{ isset($vehicle) || $errors->any() ? '' : 'display:none;' }}"
+            >
 
-    <form
-        method="POST"
-        action="{{ isset($vehicle)
-            ? route('cliente.vehiculos.update', $vehicle)
-            : route('cliente.vehiculos.store') }}"
-    >
-        @csrf
+                <h3>
+                    {{ isset($vehicle) ? 'Editar vehículo' : 'Nuevo vehículo' }}
+                </h3>
 
-        @if(isset($vehicle))
-            @method('PUT')
-        @endif
+                <form
+                    method="POST"
+                    action="{{ isset($vehicle)
+                        ? route('cliente.vehiculos.update', $vehicle)
+                        : route('cliente.vehiculos.store') }}"
+                >
 
-        <div class="form-grid">
+                    @csrf
 
-            <div class="field">
-                <label>Marca</label>
-                <input
-                    type="text"
-                    name="brand"
-                    value="{{ old('brand', $vehicle->brand ?? '') }}"
-                    placeholder="Marca"
-                    required>
+                    @if(isset($vehicle))
+                        @method('PUT')
+                    @endif
+
+
+                    <div class="form-grid">
+
+                        {{-- MARCA --}}
+
+                        <div class="field">
+
+                            <label>
+                                Marca
+                            </label>
+
+                            <input
+                                type="text"
+                                name="brand"
+                                value="{{ old('brand', $vehicle->brand ?? '') }}"
+                                placeholder="Marca"
+                                required
+                            >
+
+                        </div>
+
+
+                        {{-- MODELO --}}
+
+                        <div class="field">
+
+                            <label>
+                                Modelo
+                            </label>
+
+                            <input
+                                type="text"
+                                name="model"
+                                value="{{ old('model', $vehicle->model ?? '') }}"
+                                placeholder="Modelo"
+                                required
+                            >
+
+                        </div>
+
+
+                        {{-- AÑO --}}
+
+                        <div class="field">
+
+                            <label>
+                                Año
+                            </label>
+
+                            <input
+                                type="number"
+                                name="year"
+                                value="{{ old('year', $vehicle->year ?? '') }}"
+                                placeholder="Año"
+                                min="1950"
+                                max="2035"
+                                required
+                            >
+
+                        </div>
+
+
+                        {{-- MOTOR --}}
+
+                        <div class="field">
+
+                            <label>
+                                Motor
+                            </label>
+
+                            <input
+                                type="text"
+                                name="engine"
+                                value="{{ old('engine', $vehicle->engine ?? '') }}"
+                                placeholder="Motor"
+                                required
+                            >
+
+                        </div>
+
+
+                        {{-- PLACAS --}}
+
+                        <div class="field">
+
+                            <label>
+                                Placas
+                            </label>
+
+                            <input
+                                type="text"
+                                name="plates"
+                                value="{{ old('plates', $vehicle->plates ?? '') }}"
+                                placeholder="Placas"
+                            >
+
+                        </div>
+
+
+                        {{-- KILOMETRAJE --}}
+
+                        <div class="field">
+
+                            <label>
+                                Kilometraje
+                            </label>
+
+                            <input
+                                type="number"
+                                name="mileage"
+                                value="{{ old('mileage', $vehicle->mileage ?? '') }}"
+                                placeholder="Kilometraje"
+                                min="0"
+                                required
+                            >
+
+                        </div>
+
+
+                        {{-- COLOR --}}
+
+                        <div class="field">
+
+                            <label>
+                                Color
+                            </label>
+
+                            <input
+                                type="text"
+                                name="color"
+                                value="{{ old('color', $vehicle->color ?? '') }}"
+                                placeholder="Color"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- BOTONES FORMULARIO --}}
+
+                    <div class="form-actions">
+
+                        <button
+                            type="submit"
+                            class="btn-red"
+                        >
+                            {{ isset($vehicle) ? 'Guardar cambios' : 'Guardar' }}
+                        </button>
+
+
+                        @if(isset($vehicle))
+
+                            <a
+                                href="{{ route('cliente.vehiculos') }}"
+                                class="btn-cancel"
+                                style="text-decoration:none; color:#111;"
+                            >
+                                Cancelar
+                            </a>
+
+                        @else
+
+                            <button
+                                type="button"
+                                class="btn-cancel"
+                                onclick="ocultarFormulario()"
+                            >
+                                Cancelar
+                            </button>
+
+                        @endif
+
+                    </div>
+
+                </form>
+
             </div>
 
-            <div class="field">
-                <label>Modelo</label>
-                <input
-                    type="text"
-                    name="model"
-                    value="{{ old('model', $vehicle->model ?? '') }}"
-                    placeholder="Modelo"
-                    required>
-            </div>
 
-            <div class="field">
-                <label>Año</label>
-                <input
-                    type="number"
-                    name="year"
-                    value="{{ old('year', $vehicle->year ?? '') }}"
-                    placeholder="Año"
-                    min="1950"
-                    max="2035"
-                    required>
-            </div>
+            {{-- =========================
+                 LISTADO DE VEHÍCULOS
+            ========================== --}}
 
-            <div class="field">
-                <label>Motor</label>
-                <input
-                    type="text"
-                    name="engine"
-                    value="{{ old('engine', $vehicle->engine ?? '') }}"
-                    placeholder="Motor"
-                    required>
-            </div>
-
-            <div class="field">
-                <label>Placas</label>
-                <input
-                    type="text"
-                    name="plates"
-                    value="{{ old('plates', $vehicle->plates ?? '') }}"
-                    placeholder="Placas">
-            </div>
-
-            <div class="field">
-                <label>Kilometraje</label>
-                <input
-                    type="number"
-                    name="mileage"
-                    value="{{ old('mileage', $vehicle->mileage ?? '') }}"
-                    placeholder="Kilometraje"
-                    min="0"
-                    required>
-            </div>
-
-            <div class="field">
-                <label>Color</label>
-                <input
-                    type="text"
-                    name="color"
-                    value="{{ old('color', $vehicle->color ?? '') }}"
-                    placeholder="Color"
-                    required>
-            </div>
-
-        </div>
-
-        <div class="form-actions">
-
-            <button type="submit" class="btn-red">
-                {{ isset($vehicle) ? 'Guardar cambios' : 'Guardar' }}
-            </button>
-
-            @if(isset($vehicle))
-                <a
-                    href="{{ route('cliente.vehiculos') }}"
-                    class="btn-cancel"
-                    style="text-decoration:none; color:#111;">
-                    Cancelar
-                </a>
-            @else
-                <button
-                    type="button"
-                    class="btn-cancel"
-                    onclick="ocultarFormulario()">
-                    Cancelar
-                </button>
-            @endif
-
-        </div>
-
-    </form>
-
-</div>
-
-
-            {{-- LISTADO --}}
             @forelse($vehicles as $vehicle)
 
                 <div class="vehicle-item">
 
                     <div class="vehicle-left">
 
-                        <div class="vehicle-icon">
-                            🚗
-                        </div>
-
                         <div>
 
+                            {{-- NOMBRE DEL VEHÍCULO --}}
+
                             <div class="vehicle-name">
+
                                 {{ $vehicle->brand }}
                                 {{ $vehicle->model }}
                                 {{ $vehicle->year }}
+
                             </div>
+
+
+                            {{-- INFORMACIÓN DEL VEHÍCULO --}}
 
                             <div class="vehicle-details">
 
@@ -544,19 +729,31 @@
 
                     </div>
 
-                    <a href="{{ route('cliente.vehiculos.edit', $vehicle) }}" class="edit-link">
+
+                    {{-- EDITAR --}}
+
+                    <a
+                        href="{{ route('cliente.vehiculos.edit', $vehicle) }}"
+                        class="edit-link"
+                    >
                         Editar
                     </a>
 
                 </div>
 
+
             @empty
 
                 <div class="empty">
-                    <strong>No tienes vehículos registrados.</strong>
+
+                    <strong>
+                        No tienes vehículos registrados.
+                    </strong>
+
                     <p>
                         Presiona "+ Agregar vehículo" para registrar el primero.
                     </p>
+
                 </div>
 
             @endforelse
@@ -567,14 +764,26 @@
 
 </div>
 
+
+{{-- =========================
+     JAVASCRIPT
+========================== --}}
+
 <script>
+
     function mostrarFormulario() {
+
         document.getElementById('formularioVehiculo').style.display = 'block';
+
     }
 
+
     function ocultarFormulario() {
+
         document.getElementById('formularioVehiculo').style.display = 'none';
+
     }
+
 </script>
 
 </body>

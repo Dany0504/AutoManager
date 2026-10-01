@@ -362,7 +362,7 @@
             <nav class="menu">
                 <a href="#" class="active">Inicio</a>
                 <a href="{{ route('cliente.vehiculos') }}">Mis vehículos</a>
-                <a href="#">Agendar cita</a>
+                <a href="{{ route('cliente.citas.create') }}">Agendar cita</a>
                 <a href="#">Mis citas</a>
                 <a href="#">Rastrear orden</a>
                 <a href="#">Historial</a>
@@ -398,17 +398,25 @@
             <div class="stats">
                 <div class="card">
                     <small>Vehículos registrados</small>
-                    <h2>2</h2>
+                    <h2>{{ $vehicles->count() }}</h2>
                 </div>
 
                 <div class="card">
                     <small>Próxima cita</small>
-                    <h2 class="red">5 Sep</h2>
+                    <h2>
+                        @if($nextAppointment)
+                            {{ \Carbon\Carbon::parse($nextAppointment->appointment_date)->format('d/m/Y') }}
+                        @else
+                            Sin cita
+                        @endif
+                    </h2>
                 </div>
 
                 <div class="card">
                     <small>Orden activa</small>
-                    <h2>ORD-142</h2>
+                    <h2 class="red">
+                        {{ $activeOrder?->folio ?? 'Sin orden' }}
+                    </h2>
                 </div>
             </div>
 
@@ -417,46 +425,59 @@
 
                 <div class="section-body">
 
-                    <div class="order-top">
-                        <div class="order-badge">ORD-2026-00142</div>
-                    </div>
+                    @if($activeOrder)
 
-                    <div class="timeline-horizontal">
+    <div class="order-top">
+        <div class="order-badge">
+            {{ $activeOrder->folio }}
+        </div>
+    </div>
 
-                        <div class="step completed">
-                            <div class="circle">✓</div>
-                            <span>Recepción</span>
-                        </div>
+    <div class="timeline-horizontal">
 
-                        <div class="line completed"></div>
+        {{-- Por ahora "pendiente" corresponde a Recepción --}}
+        <div class="step current">
+            <div class="circle">•</div>
+            <span>Recepción</span>
+        </div>
 
-                        <div class="step completed">
-                            <div class="circle">✓</div>
-                            <span>Diagnóstico</span>
-                        </div>
+                <div class="line"></div>
 
-                        <div class="line completed"></div>
+                <div class="step">
+                    <div class="circle"></div>
+                    <span>Diagnóstico</span>
+                </div>
 
-                        <div class="step current">
-                            <div class="circle">•</div>
-                            <span>En proceso</span>
-                        </div>
+                <div class="line"></div>
 
-                        <div class="line"></div>
+                <div class="step">
+                    <div class="circle"></div>
+                    <span>En proceso</span>
+                </div>
 
-                        <div class="step">
-                            <div class="circle"></div>
-                            <span>Control calidad</span>
-                        </div>
+                <div class="line"></div>
 
-                        <div class="line"></div>
+                <div class="step">
+                    <div class="circle"></div>
+                    <span>Control calidad</span>
+                </div>
 
-                        <div class="step">
-                            <div class="circle"></div>
-                            <span>Entrega</span>
-                        </div>
+                <div class="line"></div>
 
-                    </div>
+                <div class="step">
+                    <div class="circle"></div>
+                    <span>Entrega</span>
+                </div>
+
+            </div>
+
+        @else
+
+            <div style="text-align:center; color:#777; padding:20px;">
+                No tienes una orden activa.
+            </div>
+
+        @endif
 
                 </div>
             </div>
@@ -466,22 +487,36 @@
 
                 <div class="section-body">
 
-                    <div class="vehicle-row">
-                        <div class="vehicle-info">
-                            <h3>Honda Accord 2005</h3>
-                            <p>ABC-123-MX · 999,999 km</p>
-                        </div>
+    @forelse($vehicles as $vehicle)
 
-                        <div class="vehicle-dot"></div>
-                    </div>
+        <div class="vehicle-row">
 
-                    <div class="vehicle-row">
-                        <div class="vehicle-info">
-                            <h3>GMC Sierra 2026</h3>
-                            <p>XYZ-456-MX · 67 km</p>
-                        </div>
+            <div class="vehicle-info">
+                <h3>
+                    {{ $vehicle->brand }}
+                    {{ $vehicle->model }}
+                    {{ $vehicle->year }}
+                </h3>
 
-                        <div class="vehicle-dot"></div>
+                <p>
+                    {{ $vehicle->plates ?: 'Sin placas' }}
+                    ·
+                    {{ number_format($vehicle->mileage ?? 0) }} km
+                </p>
+            </div>
+
+            <div class="vehicle-dot"></div>
+
+        </div>
+
+                        @empty
+
+                            <div style="text-align:center; color:#777; padding:20px;">
+                                No tienes vehículos registrados.
+                            </div>
+
+                        @endforelse
+
                     </div>
 
                 </div>
