@@ -361,13 +361,13 @@
 
             <nav class="menu">
                 <a href="#" class="active">Inicio</a>
-                <a href="#">Mis vehículos</a>
+                <a href="{{ route('cliente.vehiculos') }}">Mis vehículos</a>
                 <a href="#">Agendar cita</a>
                 <a href="#">Mis citas</a>
                 <a href="#">Rastrear orden</a>
                 <a href="#">Historial</a>
                 <a href="#">Autorizaciones</a>
-                <a href="#">Perfil</a>
+                <a href="{{ route('profile.edit') }}">Perfil</a>
             </nav>
 
         </div>

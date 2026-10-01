@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\ClientVehicleController;
 
 Route::middleware(['auth','role:administrador'])->group(function () {
 
@@ -69,6 +70,24 @@ Route::get('/dashboard', function () {
 Route::get('/cliente', function () {
     return view('cliente.dashboard');
 })->middleware(['auth', 'role:cliente']);
+
+Route::get('/cliente/vehiculos', [ClientVehicleController::class, 'index'])
+    ->middleware(['auth', 'role:cliente'])
+    ->name('cliente.vehiculos');
+
+    Route::post('/cliente/vehiculos', [ClientVehicleController::class, 'store'])
+    ->middleware(['auth', 'role:cliente'])
+    ->name('cliente.vehiculos.store');
+    
+Route::get('/cliente/vehiculos/{vehicle}/editar',
+    [ClientVehicleController::class, 'edit'])
+    ->middleware(['auth', 'role:cliente'])
+    ->name('cliente.vehiculos.edit');
+
+Route::put('/cliente/vehiculos/{vehicle}',
+    [ClientVehicleController::class, 'update'])
+    ->middleware(['auth', 'role:cliente'])
+    ->name('cliente.vehiculos.update'); 
 
 Route::get('/mecanico', function () {
     return view('mecanico.dashboard');
