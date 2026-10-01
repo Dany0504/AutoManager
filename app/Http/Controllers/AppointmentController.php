@@ -104,18 +104,55 @@ class AppointmentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Appointment $appointment)
+    public function edit(Appointment $cita)
     {
-        //
+    $clients = Client::orderBy('name')->get();
+
+    $cita->load(['client', 'vehicle', 'mechanic']);
+
+    return view('admin.citas.edit', compact('cita', 'clients'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Appointment $appointment)
+    public function update(Request $request, Appointment $cita)
     {
-        //
+    $validated = $request->validate([
+        'client_id' => 'required|exists:clients,id',
+        'vehicle_id' => 'required|exists:vehicles,id',
+        'service_type' => 'required|string|max:255',
+        'appointment_date' => 'required|date',
+        'appointment_time' => 'required',
+        'notes' => 'nullable|string',
+        'mileage' => 'nullable|integer|min:0',
+    ]);
+
+    // Verificar que el vehículo realmente pertenezca al cliente seleccionado
+    $vehicle = Vehicle::where('id', $validated['vehicle_id'])
+        ->where('client_id', $validated['client_id'])
+        ->firstOrFail();
+
+    $cita->update([
+        'client_id' => $validated['client_id'],
+        'vehicle_id' => $validated['vehicle_id'],
+        'service_type' => $validated['service_type'],
+        'appointment_date' => $validated['appointment_date'],
+        'appointment_time' => $validated['appointment_time'],
+        'notes' => $validated['notes'] ?? null,
+    ]);
+
+    // Actualizar kilometraje del vehículo
+    if ($request->filled('mileage')) {
+        $vehicle->update([
+            'mileage' => $validated['mileage']
+        ]);
     }
+
+    return redirect()
+        ->route('citas.index')
+        ->with('success', 'Cita actualizada correctamente.');
+    }   
 
     /**
      * Remove the specified resource from storage.
@@ -136,7 +173,8 @@ public function getClientData(Client $client)
             'id',
             'brand',
             'model',
-            'year'
+            'year',
+            'mileage'
         ])
     ]);
 }
