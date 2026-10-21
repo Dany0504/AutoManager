@@ -1,173 +1,950 @@
-<x-layouts.app title="Gestión de Vehículos">
+<!DOCTYPE html>
+<html lang="es">
 
-<style>
-    .btn-eliminar {
-        background-color: #ff0000;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        font-weight: bold;
-        cursor: pointer;
-    }
+<head>
 
-    .btn-eliminar:hover {
-        background-color: #c53030;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<div class="bg-white rounded-2xl shadow-lg p-6">
+    <title>Vehículos - AutoManager</title>
 
-    @if(session('success'))
-        <div class="mb-4 bg-green-100 text-green-700 p-3 rounded-lg">
-            {{ session('success') }}
-        </div>
-    @endif
+    <style>
 
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        <form method="GET" id="searchForm" class="mb-5">
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #111;
+        }
 
-    <input
-        id="searchInput"
-        type="text"
-        name="buscar"
-        value="{{ $buscar }}"
-        placeholder="Buscar marca, modelo, año o cliente..."
-        class="border rounded-lg px-4 py-2 w-80">
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
 
-</form>
+        /* =========================
+           SIDEBAR
+        ========================== */
 
-<script>
-let timer;
+        .sidebar {
+            width: 220px;
+            background: #050505;
+            color: white;
 
-const input = document.getElementById('searchInput');
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
 
-input.addEventListener('input', () => {
+            flex-shrink: 0;
+        }
 
-    clearTimeout(timer);
+        .sidebar-top {
+            padding: 18px 0;
+        }
 
-    timer = setTimeout(async () => {
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
 
-        const url = `{{ route('vehiculos.index') }}?buscar=${encodeURIComponent(input.value)}`;
+            padding: 0 18px 20px;
 
-        const response = await fetch(url, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+            border-bottom: 1px solid #1d1d1d;
+        }
+
+        .brand-box {
+            width: 26px;
+            height: 26px;
+
+            border-radius: 4px;
+
+            background: #e11d2e;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .brand-text h2 {
+            font-size: 18px;
+            line-height: 1.1;
+        }
+
+        .brand-text p {
+            color: #bbb;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .menu {
+            margin-top: 8px;
+        }
+
+        .menu a {
+            display: block;
+
+            padding: 14px 18px;
+
+            color: white;
+            text-decoration: none;
+
+            font-size: 16px;
+
+            transition: 0.2s;
+        }
+
+        .menu a.active {
+            background: #1a1a1a;
+
+            border-left: 4px solid #e11d2e;
+
+            padding-left: 14px;
+        }
+
+        .menu a:hover {
+            background: #111;
+        }
+
+        /* =========================
+           SIDEBAR BOTTOM
+        ========================== */
+
+        .sidebar-bottom {
+            padding: 18px;
+
+            border-top: 1px solid #1d1d1d;
+        }
+
+        .sidebar-bottom p {
+            color: #aaa;
+
+            font-size: 12px;
+
+            margin-bottom: 6px;
+        }
+
+        .sidebar-bottom h4 {
+            font-size: 18px;
+
+            margin-bottom: 14px;
+        }
+
+        .sidebar-bottom a,
+        .sidebar-bottom button {
+            display: block;
+
+            color: #bbb;
+
+            text-decoration: none;
+
+            font-size: 15px;
+
+            margin-top: 12px;
+
+            background: none;
+            border: none;
+
+            cursor: pointer;
+
+            padding: 0;
+        }
+
+        .sidebar-bottom a:hover,
+        .sidebar-bottom button:hover {
+            color: white;
+        }
+
+        /* =========================
+           MAIN
+        ========================== */
+
+        .main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topbar {
+            background: #f5f5f5;
+
+            border-bottom: 1px solid #ddd;
+
+            padding: 24px 28px 18px;
+        }
+
+        .topbar h1 {
+            font-size: 24px;
+
+            margin-bottom: 4px;
+        }
+
+        .topbar p {
+            color: #777;
+
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 28px;
+        }
+
+        /* =========================
+           PAGE HEADER
+        ========================== */
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 20px;
+        }
+
+        .page-header h2 {
+            font-size: 22px;
+        }
+
+        .page-header p {
+            color: #777;
+
+            font-size: 14px;
+
+            margin-top: 5px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+
+            background: #e11d2e;
+            color: white;
+
+            text-decoration: none;
+
+            padding: 12px 18px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+            font-weight: bold;
+
+            transition: 0.2s;
+
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            background: #c91828;
+        }
+
+        /* =========================
+           SECTION
+        ========================== */
+
+        .section {
+            background: white;
+
+            border: 1px solid #ddd;
+        }
+
+        .section-header {
+            padding: 18px 22px;
+
+            border-bottom: 1px solid #ddd;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .section-header h3 {
+            font-size: 18px;
+        }
+
+        /* =========================
+           SEARCH
+        ========================== */
+
+        .search-input {
+            width: 340px;
+
+            padding: 11px 14px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            outline: none;
+
+            background: #fafafa;
+
+            transition: 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: #e11d2e;
+
+            background: white;
+
+            box-shadow: 0 0 0 3px rgba(225, 29, 46, 0.10);
+        }
+
+        /* =========================
+           SUCCESS
+        ========================== */
+
+        .success-message {
+            margin: 18px 22px 0;
+
+            padding: 12px 16px;
+
+            background: #dcfce7;
+
+            color: #166534;
+
+            border: 1px solid #bbf7d0;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+        }
+
+        /* =========================
+           TABLE
+        ========================== */
+
+        .table-wrapper {
+            width: 100%;
+
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 950px;
+        }
+
+        thead {
+            background: #050505;
+
+            color: white;
+        }
+
+        th {
+            padding: 15px 16px;
+
+            text-align: left;
+
+            font-size: 13px;
+
+            font-weight: bold;
+        }
+
+        td {
+            padding: 15px 16px;
+
+            border-bottom: 1px solid #eee;
+
+            font-size: 14px;
+
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            transition: 0.15s;
+        }
+
+        tbody tr:hover {
+            background: #f8f8f8;
+        }
+
+        /* =========================
+           ACTIONS
+        ========================== */
+
+        .actions {
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            white-space: nowrap;
+        }
+
+        .btn-edit {
+            display: inline-block;
+
+            background: #050505;
+
+            color: white;
+
+            text-decoration: none;
+
+            padding: 8px 12px;
+
+            border-radius: 7px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            transition: 0.2s;
+        }
+
+        .btn-edit:hover {
+            background: #222;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+
+            color: white;
+
+            border: none;
+
+            padding: 8px 12px;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            transition: 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #b91c1c;
+        }
+
+        /* =========================
+           EMPTY
+        ========================== */
+
+        .empty {
+            text-align: center;
+
+            padding: 50px 20px;
+
+            color: #777;
+        }
+
+        .empty strong {
+            display: block;
+
+            color: #333;
+
+            font-size: 16px;
+
+            margin-bottom: 6px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 1000px) {
+
+            .section-header {
+                align-items: stretch;
+
+                flex-direction: column;
             }
-        });
 
-        const html = await response.text();
+            .search-input {
+                width: 100%;
+            }
 
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
+        }
 
-        document.getElementById('tablaVehiculos').innerHTML =
-            doc.getElementById('tablaVehiculos').innerHTML;
+        @media (max-width: 850px) {
 
-        input.focus();
-        input.setSelectionRange(input.value.length, input.value.length);
+            .layout {
+                flex-direction: column;
+            }
 
-    }, 300);
+            .sidebar {
+                width: 100%;
+            }
 
-});
-</script>
+            .menu {
+                display: grid;
 
-        <a href="{{ route('vehiculos.create') }}"
-            class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-semibold">
+                grid-template-columns: repeat(2, 1fr);
+            }
 
-            Nuevo Vehículo
+            .menu a {
+                border-left: none !important;
 
-        </a>
+                padding-left: 18px !important;
+            }
 
-    </div>
+            .menu a.active {
+                border-left: 4px solid #e11d2e !important;
+            }
 
-    <div class="overflow-x-auto">
-        <div id=tablaVehiculos>
-        <table class="w-full">
+            .content {
+                padding: 18px;
+            }
 
-            <thead class="bg-black text-white">
+            .page-header {
+                align-items: stretch;
 
-                <tr>
+                flex-direction: column;
+            }
 
-                    <th class="p-4 text-left">Cliente</th>
-                    <th class="p-4 text-left">Marca</th>
-                    <th class="p-4 text-left">Modelo</th>
-                    <th class="p-4 text-left">Año</th>
-                    <th class="p-4 text-left">Color</th>
-                    <th class="p-4 text-left">Placas</th>
-                    <th class="p-4 text-left">KM</th>
-                    <th class="p-4 text-left">Acciones</th>
+            .btn-primary {
+                text-align: center;
+            }
 
-                </tr>
+        }
 
-            </thead>
+        @media (max-width: 500px) {
 
-            <tbody>
+            .menu {
+                grid-template-columns: 1fr;
+            }
 
-                @forelse($vehicles as $vehicle)
+            .topbar {
+                padding: 20px;
+            }
 
-                <tr class="border-b hover:bg-gray-50">
+            .topbar h1 {
+                font-size: 21px;
+            }
 
-                    <td class="p-4">{{ $vehicle->client?->name ?? 'Sin cliente' }}</td>
+            .content {
+                padding: 14px;
+            }
 
-                    <td class="p-4">{{ $vehicle->brand }}</td>
+        }
 
-                    <td class="p-4">{{ $vehicle->model }}</td>
+    </style>
 
-                    <td class="p-4">{{ $vehicle->year }}</td>
+</head>
 
-                    <td class="p-4">{{ $vehicle->color }}</td>
+<body>
 
-                    <td class="p-4">{{ $vehicle->plates ?? '—' }}</td>
+<div class="layout">
 
-                    <td class="p-4">{{ number_format($vehicle->mileage) }}</td>
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
 
-                    <td class="p-4 flex gap-2">
+    <aside class="sidebar">
 
-                        <a href="#"
-                            class="bg-black hover:bg-gray-800 text-white px-3 py-2 rounded-lg">
+        <div class="sidebar-top">
 
-                            Editar
+            <div class="brand">
 
-                        </a>
+                <div class="brand-box">
+                    A
+                </div>
 
-                        <form action="{{ route('vehiculos.destroy', $vehicle) }}"
-      method="POST"
-      onsubmit="return confirm('¿Eliminar este vehículo?')"
-      style="display:inline;">
+                <div class="brand-text">
 
-    @csrf
-    @method('DELETE')
+                    <h2>
+                        AutoManager
+                    </h2>
 
-    <button type="submit" class="btn-eliminar">
-        Eliminar
-    </button>
+                    <p>
+                        Administrador
+                    </p>
 
-</form>
-                    </td>
+                </div>
 
-                </tr>
+            </div>
 
-                @empty
 
-                <tr>
+            <nav class="menu">
 
-                    <td colspan="8" class="text-center p-10 text-gray-500">
+                <a href="{{ url('/admin') }}">
+                    Dashboard
+                </a>
 
-                        No hay vehículos registrados.
+                <a href="{{ route('citas.index') }}">
+                    Citas
+                </a>
 
-                    </td>
+                <a href="#">
+                    Usuarios
+                </a>
 
-                </tr>
+                <a href="{{ route('vehiculos.index') }}" class="active">
+                    Vehículos
+                </a>
 
-                @endforelse
+                <a href="#">
+                    Mecánicos
+                </a>
 
-            </tbody>
+                <a href="#">
+                    Inventario
+                </a>
 
-        </table>
+                <a href="#">
+                    Reportes
+                </a>
+
+            </nav>
+
         </div>
-    </div>
+
+
+        <div class="sidebar-bottom">
+
+            <p>
+                Sesión activa
+            </p>
+
+            <h4>
+                {{ auth()->user()->name }}
+            </h4>
+
+            <a href="{{ route('profile.edit') }}">
+                Perfil
+            </a>
+
+            <form method="POST" action="{{ route('logout') }}">
+
+                @csrf
+
+                <button type="submit">
+                    ◦ Cerrar sesión
+                </button>
+
+            </form>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <main class="main">
+
+
+        <!-- TOPBAR -->
+
+        <div class="topbar">
+
+            <h1>
+                Vehículos
+            </h1>
+
+            <p>
+                Administración de los vehículos registrados en el taller
+            </p>
+
+        </div>
+
+
+        <!-- CONTENIDO -->
+
+        <div class="content">
+
+
+            <div class="page-header">
+
+                <div>
+
+                    <h2>
+                        Vehículos registrados
+                    </h2>
+
+                    <p>
+                        Consulta, busca y administra los vehículos de los clientes.
+                    </p>
+
+                </div>
+
+
+                <a href="{{ route('vehiculos.create') }}"
+                   class="btn-primary">
+
+                    + Nuevo Vehículo
+
+                </a>
+
+            </div>
+
+
+            <div class="section">
+
+
+                <div class="section-header">
+
+                    <h3>
+                        Lista de vehículos
+                    </h3>
+
+
+                    <form method="GET"
+                          id="searchForm">
+
+                        <input
+                            id="searchInput"
+                            type="text"
+                            name="buscar"
+                            value="{{ $buscar }}"
+                            placeholder="Buscar marca, modelo, año o cliente..."
+                            class="search-input"
+                            autocomplete="off">
+
+                    </form>
+
+                </div>
+
+
+                @if(session('success'))
+
+                    <div class="success-message">
+
+                        {{ session('success') }}
+
+                    </div>
+
+                @endif
+
+
+                <div class="table-wrapper">
+
+                    <div id="tablaVehiculos">
+
+                        <table>
+
+                            <thead>
+
+                            <tr>
+
+                                <th>
+                                    Cliente
+                                </th>
+
+                                <th>
+                                    Marca
+                                </th>
+
+                                <th>
+                                    Modelo
+                                </th>
+
+                                <th>
+                                    Año
+                                </th>
+
+                                <th>
+                                    Color
+                                </th>
+
+                                <th>
+                                    Placas
+                                </th>
+
+                                <th>
+                                    KM
+                                </th>
+
+                                <th>
+                                    Acciones
+                                </th>
+
+                            </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                            @forelse($vehicles as $vehicle)
+
+                                <tr>
+
+                                    <td>
+                                        {{ $vehicle->client?->name ?? 'Sin cliente' }}
+                                    </td>
+
+                                    <td>
+                                        {{ $vehicle->brand }}
+                                    </td>
+
+                                    <td>
+                                        {{ $vehicle->model }}
+                                    </td>
+
+                                    <td>
+                                        {{ $vehicle->year }}
+                                    </td>
+
+                                    <td>
+                                        {{ $vehicle->color }}
+                                    </td>
+
+                                    <td>
+                                        {{ $vehicle->plates ?? '—' }}
+                                    </td>
+
+                                    <td>
+                                        {{ number_format($vehicle->mileage) }}
+                                    </td>
+
+                                    <td>
+
+                                        <div class="actions">
+
+
+                                            <a href="{{ route('vehiculos.edit', $vehicle) }}"
+                                                class="btn-edit">
+
+                                                Editar
+
+                                            </a>
+
+
+                                            <form
+                                                action="{{ route('vehiculos.destroy', $vehicle) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('¿Eliminar este vehículo?')">
+
+                                                @csrf
+
+                                                @method('DELETE')
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn-delete">
+
+                                                    Eliminar
+
+                                                </button>
+
+                                            </form>
+
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            @empty
+
+                                <tr>
+
+                                    <td colspan="8">
+
+                                        <div class="empty">
+
+                                            <strong>
+                                                No hay vehículos registrados
+                                            </strong>
+
+                                            <span>
+                                                Cuando se registre un vehículo aparecerá aquí.
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            @endforelse
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
 
 </div>
 
-</x-layouts.app>
+
+<!-- =========================
+     BÚSQUEDA EN TIEMPO REAL
+========================== -->
+
+<script>
+
+    let timer;
+
+    const input = document.getElementById('searchInput');
+
+    input.addEventListener('input', () => {
+
+        clearTimeout(timer);
+
+        timer = setTimeout(async () => {
+
+            const url =
+                `{{ route('vehiculos.index') }}?buscar=${encodeURIComponent(input.value)}`;
+
+            const response = await fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const html = await response.text();
+
+            const parser = new DOMParser();
+
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const nuevaTabla =
+                doc.getElementById('tablaVehiculos');
+
+            if (nuevaTabla) {
+
+                document.getElementById('tablaVehiculos').innerHTML =
+                    nuevaTabla.innerHTML;
+
+            }
+
+            input.focus();
+
+            input.setSelectionRange(
+                input.value.length,
+                input.value.length
+            );
+
+        }, 300);
+
+    });
+
+</script>
+
+</body>
+
+</html>

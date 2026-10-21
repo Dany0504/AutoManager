@@ -1,4 +1,4 @@
-@props(['href', 'active' => false, 'icon'])
+@props(['href', 'active' => false, 'icon' => null])
 
 <a href="{{ $href }}"
     {{ $attributes->merge([

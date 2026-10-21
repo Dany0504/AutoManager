@@ -4,11 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\Vehicle;
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ClientAppointmentController extends Controller
 {
+
+
+    public function index()
+{
+    $user = Auth::user();
+
+    $client = $user->client;
+
+    if (!$client) {
+        abort(403, 'No se encontró un perfil de cliente.');
+    }
+
+    $appointments = Appointment::with([
+        'vehicle',
+        'mechanic'
+    ])
+        ->where('client_id', $client->id)
+        ->orderByDesc('appointment_date')
+        ->orderByDesc('appointment_time')
+        ->get();
+
+    return view(
+        'cliente.citas.index',
+        compact('appointments')
+    );
+}
+
     /**
      * Mostrar pantalla para agendar cita.
      */

@@ -563,7 +563,6 @@
 
                 <input name="phone" placeholder="Teléfono" required>
 
-                <input name="email" type="email" placeholder="Correo (opcional)">
 
                 <hr style="margin:20px 0;">
 
@@ -845,14 +844,22 @@ document.getElementById('publicAppointmentForm').addEventListener('submit', asyn
 
         cerrar('agendarModal');
 
-        document.getElementById('successName').textContent=result.name;
-        document.getElementById('successDate').textContent=result.date;
-        document.getElementById('successTime').textContent=result.time;
-        document.getElementById('successFolio').textContent=result.folio;
+document.getElementById('successName').textContent = result.name;
+document.getElementById('successDate').textContent = result.date;
+document.getElementById('successTime').textContent = result.time;
+document.getElementById('successFolio').textContent = result.folio;
 
-        abrir('successModal');
+// Guardar el folio temporalmente para completar la cuenta después.
+const accountForm = document.getElementById('createAccountForm');
 
-        form.reset();
+
+accountForm.dataset.appointmentId = result.appointment_id;
+accountForm.dataset.accountToken = result.account_token;
+accountForm.dataset.folio = result.folio;
+
+abrir('successModal');
+
+form.reset();
 
     }catch(error){
 
@@ -861,6 +868,53 @@ document.getElementById('publicAppointmentForm').addEventListener('submit', asyn
 
     }
 
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+document.getElementById('createAccountForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const form = this;
+    const errorBox = document.getElementById('accountError');
+
+    errorBox.style.display = 'none';
+    errorBox.textContent = '';
+
+    const data = new FormData(form);
+    data.append('appointment_id', form.dataset.appointmentId || '');
+    data.append('account_token', form.dataset.accountToken || '');
+
+    try {
+        const response = await fetch('/completar-cuenta-cita', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            },
+            body: data
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            const messages = result.errors
+                ? Object.values(result.errors).flat().join(' ')
+                : result.message || 'No se pudo crear la cuenta.';
+
+            errorBox.textContent = messages;
+            errorBox.style.display = 'block';
+            return;
+        }
+
+        if (result.success) {
+            window.location.href = result.redirect || '/cliente';
+        }
+    } catch (error) {
+        console.error(error);
+        errorBox.textContent = 'Error de conexión. Intenta nuevamente.';
+        errorBox.style.display = 'block';
+    }
+});
 });
 
 // ================= RASTREAR VEHÍCULO =================
@@ -1061,7 +1115,7 @@ document.getElementById('trackingForm').addEventListener('submit', async functio
 
             </div>
 
-            <button onclick="cerrar('successModal')">
+            <button onclick="cerrar('successModal'); abrir('accountModal')">
                 Entendido
             </button>
 
@@ -1070,6 +1124,71 @@ document.getElementById('trackingForm').addEventListener('submit', async functio
     </div>
 
 </div>
+
+
+<!-- MODAL CREAR CUENTA -->
+<div class="modal" id="accountModal">
+    <div class="contenido-modal" style="width:450px; max-width:95%;">
+
+        <div class="cabecera">
+            <h2>Completa tu cuenta</h2>
+        </div>
+
+        <div class="cuerpo">
+            <p style="margin-bottom:18px; color:#555;">
+                Tu cita ya está registrada. Completa tus datos
+                para acceder a tu panel de cliente.
+            </p>
+
+            <form id="createAccountForm">
+
+                <label for="accountEmail">Correo electrónico</label>
+                <input
+                    id="accountEmail"
+                    name="email"
+                    type="email"
+                    placeholder="tucorreo@ejemplo.com"
+                    autocomplete="email"
+                    required
+                >
+
+                <label for="accountPassword">Crear contraseña</label>
+                <input
+                    id="accountPassword"
+                    name="password"
+                    type="password"
+                    placeholder="Mínimo 8 caracteres"
+                    autocomplete="new-password"
+                    minlength="8"
+                    required
+                >
+
+                <label for="accountPasswordConfirmation">
+                    Confirmar contraseña
+                </label>
+                <input
+                    id="accountPasswordConfirmation"
+                    name="password_confirmation"
+                    type="password"
+                    placeholder="Repite tu contraseña"
+                    autocomplete="new-password"
+                    minlength="8"
+                    required
+                >
+
+                <div id="accountError"
+                    style="display:none; color:#b91c1c; margin-bottom:15px;">
+                </div>
+
+                <button type="submit">
+                    Crear mi cuenta
+                </button>
+
+            </form>
+        </div>
+    </div>
+</div>
+
 </body>
 
 </html>

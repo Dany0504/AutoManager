@@ -73,18 +73,39 @@ class VehicleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Vehicle $vehicle)
-    {
-        //
-    }
+    public function edit(Vehicle $vehiculo)
+{
+    $clients = Client::orderBy('name')->get();
+
+    return view('admin.vehiculos.edit', compact(
+        'vehiculo',
+        'clients'
+    ));
+}
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Vehicle $vehicle)
-    {
-        //
-    }
+    public function update(Request $request, Vehicle $vehiculo)
+{
+    $validated = $request->validate([
+        'client_id' => 'required|exists:clients,id',
+        'brand' => 'required|string|max:50',
+        'model' => 'required|string|max:50',
+        'year' => 'required|integer|min:1950|max:2035',
+        'engine' => 'nullable|string|max:50',
+        'color' => 'required|string|max:30',
+        'plates' => 'nullable|string|max:20',
+        'vin' => 'nullable|string|max:30',
+        'mileage' => 'required|integer|min:0',
+    ]);
+
+    $vehiculo->update($validated);
+
+    return redirect()
+        ->route('vehiculos.index')
+        ->with('success', 'Vehículo actualizado correctamente.');
+}
 
     /**
      * Remove the specified resource from storage.

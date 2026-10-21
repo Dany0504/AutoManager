@@ -1,1077 +1,1472 @@
-<x-layouts.app title="Editar Cita">
+<!DOCTYPE html>
+<html lang="es">
 
+<head>
 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<div class="max-w-5xl mx-auto">
+    <title>Editar Cita - AutoManager</title>
 
+    <style>
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<div class="bg-white rounded-2xl shadow-lg p-8">
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #111;
+        }
 
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
 
+        /* =========================
+           SIDEBAR
+        ========================== */
 
-<form action="{{ route('citas.update', $cita) }}" method="POST" class="space-y-8">
+        .sidebar {
+            width: 220px;
+            background: #050505;
+            color: white;
 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
 
+            flex-shrink: 0;
+        }
 
-@csrf
+        .sidebar-top {
+            padding: 18px 0;
+        }
 
-@method('PUT')
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
 
+            padding: 0 18px 20px;
 
+            border-bottom: 1px solid #1d1d1d;
+        }
 
-{{-- DATOS DEL CLIENTE --}}
+        .brand-box {
+            width: 26px;
+            height: 26px;
 
-<div class="flex justify-between items-center mb-6">
+            border-radius: 4px;
 
+            background: #e11d2e;
 
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-    <h2 class="text-3xl font-bold">
+            font-size: 13px;
+            font-weight: bold;
+        }
 
-        Datos del Cliente
+        .brand-text h2 {
+            font-size: 18px;
+            line-height: 1.1;
+        }
 
-    </h2>
+        .brand-text p {
+            color: #bbb;
+            font-size: 12px;
+            margin-top: 3px;
+        }
 
+        .menu {
+            margin-top: 8px;
+        }
 
+        .menu a {
+            display: block;
 
-    <button
+            padding: 14px 18px;
 
-        type="button"
+            color: white;
+            text-decoration: none;
 
-        id="openClientModal"
+            font-size: 16px;
 
-        class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl font-semibold">
+            transition: 0.2s;
+        }
 
+        .menu a.active {
+            background: #1a1a1a;
 
+            border-left: 4px solid #e11d2e;
 
-        + Nuevo Cliente
+            padding-left: 14px;
+        }
 
+        .menu a:hover {
+            background: #111;
+        }
 
+        /* =========================
+           SIDEBAR BOTTOM
+        ========================== */
 
-    </button>
+        .sidebar-bottom {
+            padding: 18px;
 
+            border-top: 1px solid #1d1d1d;
+        }
 
+        .sidebar-bottom p {
+            color: #aaa;
 
-</div>
+            font-size: 12px;
 
+            margin-bottom: 6px;
+        }
 
+        .sidebar-bottom h4 {
+            font-size: 18px;
 
-<div>
+            margin-bottom: 14px;
+        }
 
-<label class="block font-semibold mb-2">Cliente</label>
+        .sidebar-bottom a,
+        .sidebar-bottom button {
+            display: block;
 
+            color: #bbb;
 
+            text-decoration: none;
 
-<select id="clientSelect"
+            font-size: 15px;
 
-        name="client_id"
+            margin-top: 12px;
 
-        class="w-full border rounded-xl p-3">
+            background: none;
+            border: none;
 
+            cursor: pointer;
 
+            padding: 0;
+        }
 
-@foreach($clients as $client)
+        .sidebar-bottom a:hover,
+        .sidebar-bottom button:hover {
+            color: white;
+        }
 
+        /* =========================
+           MAIN
+        ========================== */
 
+        .main {
+            flex: 1;
+            min-width: 0;
+        }
 
-<option
+        .topbar {
+            background: #f5f5f5;
 
-    value="{{ $client->id }}"
+            border-bottom: 1px solid #ddd;
 
-    @selected(old('client_id', $cita->client_id) == $client->id)
+            padding: 24px 28px 18px;
+        }
 
->
+        .topbar h1 {
+            font-size: 24px;
 
-    {{ $client->name }}
+            margin-bottom: 4px;
+        }
 
-</option>
+        .topbar p {
+            color: #777;
 
+            font-size: 14px;
+        }
 
+        .content {
+            padding: 28px;
+        }
 
-@endforeach
+        /* =========================
+           PAGE HEADER
+        ========================== */
 
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
 
+            gap: 20px;
 
-</select>
+            margin-bottom: 20px;
+        }
 
-</div>
+        .page-header h2 {
+            font-size: 22px;
+        }
 
+        .page-header p {
+            color: #777;
 
+            font-size: 14px;
 
-<div>
+            margin-top: 5px;
+        }
 
-<label class="block font-semibold mb-2">Teléfono</label>
+        /* =========================
+           FORM SECTION
+        ========================== */
 
+        .section {
+            background: white;
 
+            border: 1px solid #ddd;
 
-<input
+            margin-bottom: 20px;
+        }
 
-type="text"
+        .section-header {
+            padding: 18px 22px;
 
-id="phone"
+            border-bottom: 1px solid #ddd;
 
-value="{{ $cita->client?->phone }}"
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
-readonly
+            gap: 15px;
+        }
 
-class="w-full border rounded-xl p-3 bg-gray-100">
+        .section-header h3 {
+            font-size: 18px;
+        }
 
-</div>
+        .section-header.red-line h3 {
+            border-left: 4px solid #e11d2e;
 
+            padding-left: 12px;
+        }
 
+        .section-body {
+            padding: 22px;
+        }
 
-</div>
+        /* =========================
+           GRID
+        ========================== */
 
+        .grid-2 {
+            display: grid;
 
+            grid-template-columns: repeat(2, 1fr);
 
-</div>
+            gap: 18px;
+        }
 
+        .grid-3 {
+            display: grid;
 
+            grid-template-columns: repeat(3, 1fr);
 
-{{-- DATOS DEL VEHÍCULO --}}
+            gap: 18px;
+        }
 
-<div>
+        .field {
+            width: 100%;
+        }
 
+        .field label {
+            display: block;
 
+            font-size: 14px;
 
-<h2 class="text-xl font-bold border-b-2 border-red-600 pb-2 mb-4">
+            font-weight: bold;
 
-Datos del Vehículo
+            margin-bottom: 7px;
+        }
 
-</h2>
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
 
+            border: 1px solid #ccc;
 
+            border-radius: 8px;
 
-<div class="grid md:grid-cols-2 gap-4">
+            padding: 11px 13px;
 
+            font-size: 14px;
 
+            font-family: Arial, sans-serif;
 
-<div>
+            outline: none;
 
-<label class="block font-semibold mb-2">Vehículo</label>
+            background: white;
 
+            transition: 0.2s;
+        }
 
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: #e11d2e;
 
-<select id="vehicleSelect"
+            box-shadow: 0 0 0 3px rgba(225, 29, 46, 0.10);
+        }
 
-        name="vehicle_id"
+        .field input[readonly] {
+            background: #f1f1f1;
 
-        class="w-full border rounded-xl p-3">
+            color: #777;
+        }
 
+        .field textarea {
+            resize: vertical;
 
+            min-height: 120px;
+        }
 
-<option value="">
+        /* =========================
+           ACTION BUTTONS
+        ========================== */
 
-Selecciona un vehículo
+        .btn-red {
+            background: #e11d2e;
 
-</option>
+            color: white;
 
+            border: none;
 
+            border-radius: 8px;
 
-</select>
+            padding: 11px 17px;
 
+            font-size: 14px;
 
+            font-weight: bold;
 
-<p id="vehicleMessage"
+            cursor: pointer;
 
-    class="text-sm text-red-600 mt-2 hidden">
+            transition: 0.2s;
+        }
 
+        .btn-red:hover {
+            background: #c91828;
+        }
 
+        .btn-black {
+            background: #050505;
 
-Este cliente no tiene vehículos registrados.
+            color: white;
 
+            border: none;
 
+            border-radius: 8px;
 
-</p>
+            padding: 11px 17px;
 
-</div>
+            font-size: 14px;
 
+            font-weight: bold;
 
+            cursor: pointer;
 
-<div class="flex items-end">
+            transition: 0.2s;
+        }
 
-<button
-    type="button"
-    id="openVehicleModal"
-    class="bg-black hover:bg-gray-900 text-white px-6 py-3 rounded-xl font-semibold transition">
+        .btn-black:hover {
+            background: #222;
+        }
 
-    + Registrar Vehículo
+        .btn-gray {
+            background: #e5e5e5;
 
-</button>
+            color: #222;
 
-</div>
+            border: none;
 
+            border-radius: 8px;
 
+            padding: 11px 17px;
 
-<div>
+            font-size: 14px;
 
-<label class="block font-semibold mb-2">
+            font-weight: bold;
 
-Kilometraje actual
+            cursor: pointer;
 
-</label>
+            transition: 0.2s;
+        }
 
+        .btn-gray:hover {
+            background: #d4d4d4;
+        }
 
+        .form-actions {
+            display: flex;
 
-<input
+            justify-content: flex-end;
 
-type="number"
+            gap: 10px;
 
-id="mileage"
+            margin-top: 5px;
+        }
 
-name="mileage"
+        /* =========================
+           VEHICLE MESSAGE
+        ========================== */
 
-value="{{ old('mileage', $cita->vehicle?->mileage) }}"
+        .vehicle-message {
+            color: #dc2626;
 
-class="w-full border rounded-xl p-3"
+            font-size: 13px;
 
-placeholder="258000">
+            margin-top: 7px;
+        }
 
-</div>
+        .hidden {
+            display: none;
+        }
 
+        /* =========================
+           MODAL
+        ========================== */
 
+        .modal {
+            position: fixed;
 
-</div>
+            inset: 0;
 
+            background: rgba(0, 0, 0, 0.70);
 
+            display: none;
 
-</div>
+            align-items: center;
+            justify-content: center;
 
+            z-index: 1000;
 
+            padding: 20px;
+        }
 
-{{-- DATOS DEL SERVICIO --}}
+        .modal.show {
+            display: flex;
+        }
 
-<div>
+        .modal-box {
+            background: white;
 
+            border-radius: 18px;
 
+            width: 100%;
 
-<h2 class="text-xl font-bold border-b-2 border-red-600 pb-2 mb-4">
+            max-width: 720px;
 
-Servicio
+            max-height: 90vh;
 
-</h2>
+            overflow-y: auto;
 
+            box-shadow: 0 20px 50px rgba(0,0,0,.30);
+        }
 
+        .modal-header {
+            background: #050505;
 
-<div class="grid md:grid-cols-2 gap-4">
+            color: white;
 
+            padding: 22px 26px;
 
+            display: flex;
 
-<div>
+            justify-content: space-between;
 
-<label class="block font-semibold mb-2">Servicio</label>
+            align-items: center;
+        }
 
+        .modal-header h2 {
+            font-size: 22px;
+        }
 
+        .modal-header p {
+            color: #aaa;
 
-<select name="service_type" class="w-full border rounded-xl p-3">
+            font-size: 13px;
 
+            margin-top: 5px;
+        }
 
+        .modal-close {
+            background: none;
 
-    <option value="Mantenimiento general"
+            border: none;
 
-        @selected(old('service_type', $cita->service_type) == 'Mantenimiento general')>
+            color: white;
 
-        Mantenimiento general
+            font-size: 30px;
 
-    </option>
+            cursor: pointer;
 
+            line-height: 1;
+        }
 
+        .modal-body {
+            padding: 26px;
+        }
 
-    <option value="Diagnóstico"
+        .modal-actions {
+            display: flex;
 
-        @selected(old('service_type', $cita->service_type) == 'Diagnóstico')>
+            justify-content: flex-end;
 
-        Diagnóstico
+            gap: 10px;
 
-    </option>
+            margin-top: 20px;
+        }
 
+        /* =========================
+           SUCCESS
+        ========================== */
 
+        .success-message {
+            margin-bottom: 20px;
 
-    <option value="Cambio de aceite"
+            padding: 12px 16px;
 
-        @selected(old('service_type', $cita->service_type) == 'Cambio de aceite')>
+            background: #dcfce7;
 
-        Cambio de aceite
+            color: #166534;
 
-    </option>
+            border: 1px solid #bbf7d0;
 
+            border-radius: 8px;
 
+            font-size: 14px;
 
-    <option value="Frenos"
+            font-weight: 600;
+        }
 
-        @selected(old('service_type', $cita->service_type) == 'Frenos')>
+        /* =========================
+           RESPONSIVE
+        ========================== */
 
-        Frenos
+        @media (max-width: 1000px) {
 
-    </option>
-
-
-
-    <option value="Suspensión"
-
-        @selected(old('service_type', $cita->service_type) == 'Suspensión')>
-
-        Suspensión
-
-    </option>
-
-
-
-    <option value="Motor"
-
-        @selected(old('service_type', $cita->service_type) == 'Motor')>
-
-        Motor
-
-    </option>
-
-
-
-    <option value="Transmisión"
-
-        @selected(old('service_type', $cita->service_type) == 'Transmisión')>
-
-        Transmisión
-
-    </option>
-
-
-
-    <option value="Eléctrico"
-
-        @selected(old('service_type', $cita->service_type) == 'Eléctrico')>
-
-        Eléctrico
-
-    </option>
-
-
-
-    <option value="Otro"
-
-        @selected(old('service_type', $cita->service_type) == 'Otro')>
-
-        Otro
-
-    </option>
-
-
-
-</select>
-
-</div>
-
-
-
-<div>
-
-<label class="block font-semibold mb-2">Prioridad</label>
-
-
-
-<select name="priority"
-
-class="w-full border rounded-xl p-3">
-
-<option>Normal</option>
-
-<option>Urgente</option>
-
-</select>
-
-</div>
-
-
-
-<div>
-
-<label class="block font-semibold mb-2">Fecha</label>
-
-
-
-<input
-
-type="date"
-
-name="appointment_date"
-
-value="{{ old('appointment_date', $cita->appointment_date) }}"
-
-class="w-full border rounded-xl p-3">
-
-</div>
-
-
-
-<div>
-
-<label class="block font-semibold mb-2">Hora</label>
-
-
-
-<input
-
-type="time"
-
-name="appointment_time"
-
-value="{{ old('appointment_time', substr($cita->appointment_time, 0, 5)) }}"
-
-class="w-full border rounded-xl p-3">
-
-</div>
-
-
-
-</div>
-
-
-
-<div class="mt-4">
-
-<label class="block font-semibold mb-2">Observaciones</label>
-
-
-
-<textarea
-
-name="notes"
-
-rows="4"
-
-class="w-full border rounded-xl p-3"
-
-placeholder="Describe la falla...">{{ old('notes', $cita->notes) }}</textarea>
-
-</div>
-
-
-
-</div>
-
-
-
-<div class="flex justify-end gap-3">
-
-
-
-<a href="{{ route('citas.index') }}"
-
-class="bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-xl">
-
-
-
-Cancelar
-
-
-
-</a>
-
-
-
-<button
-
-class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-semibold">
-
-
-
-Guardar Cambios
-
-
-
-</button>
-
-
-
-</div>
-
-
-
-</form>
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-<script>
-
-
-
-const clientSelect = document.getElementById('clientSelect');
-
-const phoneInput = document.getElementById('phone');
-
-const vehicleSelect = document.getElementById('vehicleSelect');
-
-const vehicleMessage = document.getElementById('vehicleMessage');
-
-const mileageInput = document.getElementById('mileage');
-
-
-
-const initialVehicleId = @json(old('vehicle_id', $cita->vehicle_id));
-
-
-
-let currentVehicles = [];
-
-
-
-async function loadClientData(id, selectedVehicleId = null){
-
-
-
-    if(!id){
-
-        return;
-
-    }
-
-
-
-    const response = await fetch(`/admin/clientes/${id}/vehiculos`);
-
-
-
-    const data = await response.json();
-
-
-
-    phoneInput.value = data.phone ?? '';
-
-
-
-    currentVehicles = data.vehicles;
-
-
-
-    vehicleSelect.innerHTML =
-
-        '<option value="">Selecciona un vehículo</option>';
-
-
-
-    if(data.vehicles.length === 0){
-
-
-
-        vehicleMessage.classList.remove('hidden');
-
-        mileageInput.value = '';
-
-
-
-        return;
-
-    }
-
-
-
-    vehicleMessage.classList.add('hidden');
-
-
-
-    data.vehicles.forEach(vehicle => {
-
-
-
-        const option = document.createElement('option');
-
-
-
-        option.value = vehicle.id;
-
-
-
-        option.textContent =
-
-            `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
-
-
-
-        if(
-
-            selectedVehicleId &&
-
-            String(vehicle.id) === String(selectedVehicleId)
-
-        ){
-
-            option.selected = true;
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
 
         }
 
+        @media (max-width: 850px) {
 
+            .layout {
+                flex-direction: column;
+            }
 
-        vehicleSelect.appendChild(option);
+            .sidebar {
+                width: 100%;
+            }
 
+            .menu {
+                display: grid;
 
+                grid-template-columns: repeat(2, 1fr);
+            }
 
-    });
+            .menu a {
+                border-left: none !important;
 
+                padding-left: 18px !important;
+            }
 
+            .menu a.active {
+                border-left: 4px solid #e11d2e !important;
+            }
 
-    actualizarKilometraje();
+            .content {
+                padding: 18px;
+            }
 
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
 
+        }
 
-}
+        @media (max-width: 500px) {
 
+            .menu {
+                grid-template-columns: 1fr;
+            }
 
+            .topbar {
+                padding: 20px;
+            }
 
-function actualizarKilometraje(){
+            .topbar h1 {
+                font-size: 21px;
+            }
 
+            .content {
+                padding: 14px;
+            }
 
+            .section-body {
+                padding: 16px;
+            }
 
-    const vehicle = currentVehicles.find(
+            .page-header {
+                align-items: stretch;
 
-        vehicle => String(vehicle.id) === String(vehicleSelect.value)
+                flex-direction: column;
+            }
 
-    );
+            .form-actions {
+                flex-direction: column-reverse;
+            }
 
+            .form-actions a,
+            .form-actions button {
+                width: 100%;
 
+                text-align: center;
+            }
 
-    mileageInput.value = vehicle?.mileage ?? '';
+        }
 
+    </style>
 
+</head>
 
-}
 
+<body>
 
 
-clientSelect.addEventListener('change', async () => {
+<div class="layout">
 
 
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
 
-    mileageInput.value = '';
+    <aside class="sidebar">
 
+        <div class="sidebar-top">
 
+            <div class="brand">
 
-    await loadClientData(clientSelect.value);
+                <div class="brand-box">
+                    A
+                </div>
 
+                <div class="brand-text">
 
+                    <h2>
+                        AutoManager
+                    </h2>
 
-});
+                    <p>
+                        Administrador
+                    </p>
 
+                </div>
 
+            </div>
 
-vehicleSelect.addEventListener('change', actualizarKilometraje);
 
+            <nav class="menu">
 
+                <a href="{{ url('/admin') }}">
+                    Dashboard
+                </a>
 
-window.addEventListener('DOMContentLoaded', async () => {
+                <a href="{{ route('citas.index') }}" class="active">
+                    Citas
+                </a>
 
+                <a href="#">
+                    Usuarios
+                </a>
 
+                <a href="{{ route('vehiculos.index') }}">
+                    Vehículos
+                </a>
 
-    if(clientSelect.value){
+                <a href="#">
+                    Mecánicos
+                </a>
 
+                <a href="#">
+                    Inventario
+                </a>
 
+                <a href="#">
+                    Reportes
+                </a>
 
-        await loadClientData(
+            </nav>
 
-            clientSelect.value,
+        </div>
 
-            initialVehicleId
 
-        );
+        <div class="sidebar-bottom">
 
+            <p>
+                Sesión activa
+            </p>
 
+            <h4>
+                {{ auth()->user()->name }}
+            </h4>
 
-    }
+            <a href="{{ route('profile.edit') }}">
+                Perfil
+            </a>
 
+            <form method="POST" action="{{ route('logout') }}">
 
+                @csrf
 
-});
+                <button type="submit">
+                    ◦ Cerrar sesión
+                </button>
 
+            </form>
 
+        </div>
 
-</script>
+    </aside>
 
-</script>
 
+    <!-- =========================
+         MAIN
+    ========================== -->
 
+    <main class="main">
 
 
+        <div class="topbar">
 
+            <h1>
+                Editar cita
+            </h1>
 
+            <p>
+                Modifica la información y programación de la cita.
+            </p>
 
-<!-- ================= MODAL REGISTRAR VEHÍCULO ================= -->
+        </div>
 
 
+        <div class="content">
 
-<div id="vehicleModal"
 
-     class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50">
+            <div class="page-header">
 
+                <div>
 
+                    <h2>
+                        Cita #{{ $cita->folio ?? $cita->id }}
+                    </h2>
 
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
+                    <p>
+                        Actualiza los datos del cliente, vehículo y servicio.
+                    </p>
 
+                </div>
 
+            </div>
 
-        <!-- Encabezado -->
 
+            @if(session('success'))
 
+                <div class="success-message">
+                    {{ session('success') }}
+                </div>
 
-        <div class="bg-black px-8 py-6 flex justify-between items-center">
+            @endif
 
 
+            <!-- =========================
+                 FORMULARIO
+            ========================== -->
+
+            <form
+                action="{{ route('citas.update', $cita) }}"
+                method="POST">
+
+                @csrf
+
+                @method('PUT')
+
+
+
+<!-- =========================
+     ASIGNACIÓN DEL MECÁNICO
+========================== -->
+<div class="section">
+    <div class="section-header red-line">
+        <h3>Asignación del mecánico</h3>
+    </div>
+
+    <div class="section-body">
+        <div class="field">
+            <label for="mechanic_id">Mecánico asignado</label>
+
+            <select id="mechanic_id" name="mechanic_id">
+                <option value="">Sin asignar</option>
+
+                @foreach($mechanics as $mechanic)
+                    <option
+                        value="{{ $mechanic->id }}"
+                        {{ old('mechanic_id', $cita->mechanic_id) == $mechanic->id ? 'selected' : '' }}
+                    >
+                        {{ $mechanic->name }}
+                    </option>
+                @endforeach
+            </select>
+
+            @error('mechanic_id')
+                <p class="vehicle-message">{{ $message }}</p>
+            @enderror
+
+            <p style="color:#777; font-size:13px; margin-top:8px;">
+                Selecciona el mecánico responsable de esta cita o déjala sin asignar.
+            </p>
+        </div>
+    </div>
+</div>
+
+
+                <!-- =========================
+                 CLIENTE
+                ========================== -->
+
+                <div class="section">
+
+                    <div class="section-header red-line">
+
+                        <h3>
+                            Datos del Cliente
+                        </h3>
+
+                        <button
+                            type="button"
+                            id="openClientModal"
+                            class="btn-red">
+
+                            + Nuevo Cliente
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="section-body">
+
+                        <div class="grid-2">
+
+
+                            <div class="field">
+
+                                <label for="clientSelect">
+                                    Cliente
+                                </label>
+
+                                <select
+                                    id="clientSelect"
+                                    name="client_id">
+
+                                    @foreach($clients as $client)
+
+                                        <option
+                                            value="{{ $client->id }}"
+                                            @selected(old('client_id', $cita->client_id) == $client->id)>
+
+                                            {{ $client->name }}
+
+                                        </option>
+
+                                    @endforeach
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="phone">
+                                    Teléfono
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="phone"
+                                    value="{{ $cita->client?->phone }}"
+                                    readonly>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     VEHICULO
+                ========================== -->
+
+                <div class="section">
+
+                    <div class="section-header red-line">
+
+                        <h3>
+                            Datos del Vehículo
+                        </h3>
+
+                    </div>
+
+
+                    <div class="section-body">
+
+                        <div class="grid-2">
+
+
+                            <div class="field">
+
+                                <label for="vehicleSelect">
+                                    Vehículo
+                                </label>
+
+                                <select
+                                    id="vehicleSelect"
+                                    name="vehicle_id">
+
+                                    <option value="">
+                                        Selecciona un vehículo
+                                    </option>
+
+                                </select>
+
+
+                                <p
+                                    id="vehicleMessage"
+                                    class="vehicle-message hidden">
+
+                                    Este cliente no tiene vehículos registrados.
+
+                                </p>
+
+                            </div>
+
+
+                            <div style="display:flex;align-items:flex-end;">
+
+                                <button
+                                    type="button"
+                                    id="openVehicleModal"
+                                    class="btn-black">
+
+                                    + Registrar Vehículo
+
+                                </button>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="mileage">
+                                    Kilometraje actual
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="mileage"
+                                    name="mileage"
+                                    value="{{ old('mileage', $cita->vehicle?->mileage) }}"
+                                    placeholder="258000">
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     SERVICIO
+                ========================== -->
+
+                <div class="section">
+
+                    <div class="section-header red-line">
+
+                        <h3>
+                            Servicio
+                        </h3>
+
+                    </div>
+
+
+                    <div class="section-body">
+
+
+                        <div class="grid-3">
+
+
+                            <div class="field">
+
+                                <label for="service_type">
+                                    Servicio
+                                </label>
+
+                                <select
+                                    id="service_type"
+                                    name="service_type">
+
+                                    <option
+                                        value="Mantenimiento general"
+                                        @selected(old('service_type', $cita->service_type) == 'Mantenimiento general')>
+
+                                        Mantenimiento general
+
+                                    </option>
+
+                                    <option
+                                        value="Diagnóstico"
+                                        @selected(old('service_type', $cita->service_type) == 'Diagnóstico')>
+
+                                        Diagnóstico
+
+                                    </option>
+
+                                    <option
+                                        value="Cambio de aceite"
+                                        @selected(old('service_type', $cita->service_type) == 'Cambio de aceite')>
+
+                                        Cambio de aceite
+
+                                    </option>
+
+                                    <option
+                                        value="Frenos"
+                                        @selected(old('service_type', $cita->service_type) == 'Frenos')>
+
+                                        Frenos
+
+                                    </option>
+
+                                    <option
+                                        value="Suspensión"
+                                        @selected(old('service_type', $cita->service_type) == 'Suspensión')>
+
+                                        Suspensión
+
+                                    </option>
+
+                                    <option
+                                        value="Motor"
+                                        @selected(old('service_type', $cita->service_type) == 'Motor')>
+
+                                        Motor
+
+                                    </option>
+
+                                    <option
+                                        value="Transmisión"
+                                        @selected(old('service_type', $cita->service_type) == 'Transmisión')>
+
+                                        Transmisión
+
+                                    </option>
+
+                                    <option
+                                        value="Eléctrico"
+                                        @selected(old('service_type', $cita->service_type) == 'Eléctrico')>
+
+                                        Eléctrico
+
+                                    </option>
+
+                                    <option
+                                        value="Otro"
+                                        @selected(old('service_type', $cita->service_type) == 'Otro')>
+
+                                        Otro
+
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="priority">
+                                    Prioridad
+                                </label>
+
+                                <select
+                                    id="priority"
+                                    name="priority">
+
+                                    <option
+                                        value="Normal"
+                                        @selected(old('priority', $cita->priority ?? 'Normal') == 'Normal')>
+
+                                        Normal
+
+                                    </option>
+
+                                    <option
+                                        value="Urgente"
+                                        @selected(old('priority', $cita->priority ?? '') == 'Urgente')>
+
+                                        Urgente
+
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="appointment_date">
+                                    Fecha
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="appointment_date"
+                                    name="appointment_date"
+                                    value="{{ old('appointment_date', $cita->appointment_date) }}">
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="appointment_time">
+                                    Hora
+                                </label>
+
+                                <input
+                                    type="time"
+                                    id="appointment_time"
+                                    name="appointment_time"
+                                    value="{{ old('appointment_time', substr($cita->appointment_time, 0, 5)) }}">
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="field" style="margin-top:18px;">
+
+                            <label for="notes">
+                                Observaciones
+                            </label>
+
+                            <textarea
+                                id="notes"
+                                name="notes"
+                                rows="4"
+                                placeholder="Describe la falla...">{{ old('notes', $cita->notes) }}</textarea>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     BOTONES
+                ========================== -->
+
+                <div class="form-actions">
+
+                    <a
+                        href="{{ route('citas.index') }}"
+                        class="btn-black"
+                        style="text-decoration:none;">
+
+                        Cancelar
+
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="btn-red">
+
+                        Guardar Cambios
+
+                    </button>
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     MODAL REGISTRAR VEHÍCULO
+========================================================= -->
+
+<div
+    id="vehicleModal"
+    class="modal">
+
+
+    <div class="modal-box">
+
+
+        <div class="modal-header">
 
             <div>
 
-                <h2 class="text-3xl font-bold text-white">
-
+                <h2>
                     Registrar Vehículo
-
                 </h2>
 
-
-
-                <p class="text-gray-400 text-sm">
-
+                <p>
                     Agrega un vehículo al cliente seleccionado.
-
                 </p>
 
             </div>
 
 
-
-            <button id="closeVehicleModal"
-
-                    type="button"
-
-                    class="text-white text-3xl hover:text-red-500 transition">
+            <button
+                type="button"
+                id="closeVehicleModal"
+                class="modal-close">
 
                 ×
 
             </button>
 
-
-
         </div>
 
 
-
-        <!-- Formulario -->
-
+        <div class="modal-body">
 
 
-        <form id="newVehicleForm" class="p-8 space-y-5">
+            <form
+                id="newVehicleForm">
+
+                @csrf
 
 
-
-            @csrf
-
-
-
-            <input type="hidden"
-
-                   id="vehicleClientId"
-
-                   name="client_id">
+                <input
+                    type="hidden"
+                    id="vehicleClientId"
+                    name="client_id">
 
 
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
+                <div class="grid-2">
 
 
-                <!-- Año -->
+                    <div class="field">
 
+                        <label for="yearSelect">
+                            Año
+                        </label>
 
-
-                <div>
-
-                    <label class="block mb-2 font-semibold text-gray-700">
-
-                        Año
-
-                    </label>
-
-
-
-                    <select id="yearSelect"
-
+                        <select
+                            id="yearSelect"
                             name="year"
+                            required>
 
+                            <option value="">
+                                Selecciona un año
+                            </option>
+
+                            @for($year = date('Y'); $year >= 1995; $year--)
+
+                                <option value="{{ $year }}">
+                                    {{ $year }}
+                                </option>
+
+                            @endfor
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="brandSelect">
+                            Marca
+                        </label>
+
+                        <input
+                            type="text"
+                            id="brandSelect"
+                            name="brand"
                             required
+                            placeholder="Ej. Toyota">
 
-                            class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
-
-
-
-                        <option value="">Selecciona un año</option>
+                    </div>
 
 
+                    <div class="field">
 
-                        @for($year=date('Y');$year>=1995;$year--)
+                        <label for="modelSelect">
+                            Modelo
+                        </label>
 
-                            <option value="{{ $year }}">{{ $year }}</option>
+                        <input
+                            type="text"
+                            id="modelSelect"
+                            name="model"
+                            required
+                            placeholder="Ej. Corolla">
 
-                        @endfor
+                    </div>
 
 
+                    <div class="field">
 
-                    </select>
+                        <label for="engineSelect">
+                            Motor
+                        </label>
 
+                        <input
+                            type="text"
+                            id="engineSelect"
+                            name="engine"
+                            required
+                            placeholder="Ej. 1.8L">
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="vehicleColor">
+                            Color
+                        </label>
+
+                        <input
+                            type="text"
+                            id="vehicleColor"
+                            name="color"
+                            required
+                            placeholder="Ej. Azul">
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="vehicleMileage">
+                            Kilometraje
+                        </label>
+
+                        <input
+                            type="number"
+                            id="vehicleMileage"
+                            name="mileage"
+                            required
+                            placeholder="258000">
+
+                    </div>
 
 
                 </div>
 
 
+                <div class="field" style="margin-top:18px;">
 
-                <!-- Marca -->
-
-
-
-                <div>
-
-                    <label class="block mb-2 font-semibold text-gray-700">
-
-                        Marca
-
-                    </label>
-
-
-
-                    <input
-                    type="text"
-                    id="brandSelect"
-                    name="brand"
-                    required
-                    placeholder="Ej. Toyota"
-                    class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
-
-
-
-                </div>
-
-
-
-                <!-- Modelo -->
-
-
-
-                <div>
-
-                    <label class="block mb-2 font-semibold text-gray-700">
-
-                        Modelo
-
+                    <label for="vehiclePlates">
+                        Placas
                     </label>
 
                     <input
                         type="text"
-                        id="modelSelect"
-                        name="model"
-                        required
-                        placeholder="Ej. Corolla"
-                        class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
+                        id="vehiclePlates"
+                        name="plates"
+                        placeholder="WEJ117">
 
                 </div>
 
 
+                <div class="field" style="margin-top:18px;">
 
-                <!-- Motor -->
-
-
-
-                <div>
-
-                    <label class="block mb-2 font-semibold text-gray-700">
-
-                        Motor
-
+                    <label for="vehicleVin">
+                        VIN (opcional)
                     </label>
-
 
                     <input
-                    type="text"
-                    id="engineSelect"
-                    name="engine"
-                    required
-                    placeholder="Ej. 1.8L"
-                    class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
-
-
-
-                </div>
-
-                <!-- Color -->
-
-                <div>
-
-                    <label class="block mb-2 font-semibold text-gray-700">
-
-                        Color
-
-                    </label>
-
-
-
-                    <input type="text"
-
-                           name="color"
-
-                           required
-
-                           placeholder="Ej. Azul"
-
-                           class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
-
-
+                        type="text"
+                        id="vehicleVin"
+                        name="vin"
+                        placeholder="1HGCM82633A123456">
 
                 </div>
 
 
+                <div class="modal-actions">
 
-                <!-- Kilometraje -->
-
-
-
-                <div>
-
-                    <label class="block mb-2 font-semibold text-gray-700">
-
-                        Kilometraje
-
-                    </label>
-
-
-
-                    <input type="number"
-
-                           name="mileage"
-
-                           required
-
-                           placeholder="258000"
-
-                           class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
-
-
-
-                </div>
-
-
-
-            </div>
-
-
-
-            <!-- Placas -->
-
-
-
-            <div>
-
-                <label class="block mb-2 font-semibold text-gray-700">
-
-                    Placas
-
-                </label>
-
-
-
-                <input type="text"
-
-                       name="plates"
-
-                       placeholder="WEJ117"
-
-                       class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
-
-            </div>
-
-
-
-            <!-- VIN -->
-
-
-
-            <div>
-
-                <label class="block mb-2 font-semibold text-gray-700">
-
-                    VIN (opcional)
-
-                </label>
-
-
-
-                <input type="text"
-
-                       name="vin"
-
-                       placeholder="1HGCM82633A123456"
-
-                       class="w-full border-2 border-gray-300 rounded-xl p-3 focus:border-red-600 focus:ring-red-600">
-
-            </div>
-
-
-
-            <!-- Botones -->
-
-
-
-            <div class="flex justify-end gap-3 pt-3">
-
-
-
-                <button type="button"
-
+                    <button
+                        type="button"
                         id="cancelVehicleModal"
+                        class="btn-gray">
 
-                        class="px-5 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 font-semibold">
+                        Cancelar
 
-
-
-                    Cancelar
-
+                    </button>
 
 
-                </button>
+                    <button
+                        type="submit"
+                        class="btn-red">
+
+                        Guardar Vehículo
+
+                    </button>
+
+                </div>
 
 
+            </form>
 
-                <button type="submit"
-
-                        class="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold shadow-lg">
-
-
-
-                    Guardar Vehículo
-
-
-
-                </button>
-
-
-
-            </div>
-
-
-
-        </form>
-
-
+        </div>
 
     </div>
 
-
-
 </div>
-
-
-
 
 
 <script>
@@ -1079,351 +1474,356 @@ window.addEventListener('DOMContentLoaded', async () => {
 document.addEventListener('DOMContentLoaded', function () {
 
 
-
-    const modal = document.getElementById('vehicleModal');
-
-    const open = document.getElementById('openVehicleModal');
-
-    const close = document.getElementById('closeVehicleModal');
-
-    const cancel = document.getElementById('cancelVehicleModal');
-
-
-
-    const form = document.getElementById('newVehicleForm');
-
-
+    /* =====================================================
+       ELEMENTOS DEL FORMULARIO PRINCIPAL
+    ===================================================== */
 
     const clientSelect = document.getElementById('clientSelect');
 
+    const phoneInput = document.getElementById('phone');
+
     const vehicleSelect = document.getElementById('vehicleSelect');
 
+    const vehicleMessage = document.getElementById('vehicleMessage');
+
+    const mileageInput = document.getElementById('mileage');
 
 
-    const yearSelect = document.getElementById('yearSelect');
-
-    const brandSelect = document.getElementById('brandSelect');
-
-    const modelSelect = document.getElementById('modelSelect');
-
-    const engineSelect = document.getElementById('engineSelect');
+    const initialVehicleId =
+        @json(old('vehicle_id', $cita->vehicle_id));
 
 
-
-    // Abrir modal
-
+    let currentVehicles = [];
 
 
-    open.addEventListener('click', () => {
+    /* =====================================================
+       CARGAR CLIENTE Y VEHÍCULOS
+    ===================================================== */
+
+    async function loadClientData(id, selectedVehicleId = null) {
+
+        if (!id) {
+            return;
+        }
 
 
+        const response =
+            await fetch(`/admin/clientes/${id}/vehiculos`);
 
-        if (!clientSelect.value) {
 
-            alert('Primero selecciona un cliente.');
+        const data =
+            await response.json();
+
+
+        phoneInput.value =
+            data.phone ?? '';
+
+
+        currentVehicles =
+            data.vehicles;
+
+
+        vehicleSelect.innerHTML =
+            '<option value="">Selecciona un vehículo</option>';
+
+
+        if (data.vehicles.length === 0) {
+
+            vehicleMessage.classList.remove('hidden');
+
+            mileageInput.value = '';
 
             return;
 
         }
 
 
-
-        document.getElementById('vehicleClientId').value = clientSelect.value;
-
+        vehicleMessage.classList.add('hidden');
 
 
-        modal.classList.remove('hidden');
-
-        modal.classList.add('flex');
+        data.vehicles.forEach(vehicle => {
 
 
+            const option =
+                document.createElement('option');
+
+
+            option.value =
+                vehicle.id;
+
+
+            option.textContent =
+                `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
+
+
+            if (
+                selectedVehicleId &&
+                String(vehicle.id) === String(selectedVehicleId)
+            ) {
+
+                option.selected = true;
+
+            }
+
+
+            vehicleSelect.appendChild(option);
+
+        });
+
+
+        actualizarKilometraje();
+
+    }
+
+
+    /* =====================================================
+       ACTUALIZAR KILOMETRAJE
+    ===================================================== */
+
+    function actualizarKilometraje() {
+
+
+        const vehicle =
+            currentVehicles.find(
+                vehicle =>
+                    String(vehicle.id) ===
+                    String(vehicleSelect.value)
+            );
+
+
+        mileageInput.value =
+            vehicle?.mileage ?? '';
+
+    }
+
+
+    /* =====================================================
+       CAMBIAR CLIENTE
+    ===================================================== */
+
+    clientSelect.addEventListener(
+        'change',
+        async () => {
+
+            mileageInput.value = '';
+
+            await loadClientData(
+                clientSelect.value
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       CAMBIAR VEHÍCULO
+    ===================================================== */
+
+    vehicleSelect.addEventListener(
+        'change',
+        actualizarKilometraje
+    );
+
+
+    /* =====================================================
+       CARGA INICIAL
+    ===================================================== */
+
+    if (clientSelect.value) {
+
+        loadClientData(
+            clientSelect.value,
+            initialVehicleId
+        );
+
+    }
+
+
+    /* =====================================================
+       MODAL
+    ===================================================== */
+
+    const modal =
+        document.getElementById('vehicleModal');
+
+    const open =
+        document.getElementById('openVehicleModal');
+
+    const close =
+        document.getElementById('closeVehicleModal');
+
+    const cancel =
+        document.getElementById('cancelVehicleModal');
+
+    const form =
+        document.getElementById('newVehicleForm');
+
+
+    /* =====================================================
+       ABRIR MODAL
+    ===================================================== */
+
+    open.addEventListener('click', () => {
+
+
+        if (!clientSelect.value) {
+
+            alert(
+                'Primero selecciona un cliente.'
+            );
+
+            return;
+
+        }
+
+
+        document.getElementById(
+            'vehicleClientId'
+        ).value =
+            clientSelect.value;
+
+
+        modal.classList.add('show');
 
     });
 
 
-
-    // Cerrar modal
-
-
+    /* =====================================================
+       CERRAR MODAL
+    ===================================================== */
 
     function cerrarModal() {
 
-
-
-        modal.classList.add('hidden');
-
-        modal.classList.remove('flex');
-
-
+        modal.classList.remove('show');
 
         form.reset();
 
     }
 
 
+    close.addEventListener(
+        'click',
+        cerrarModal
+    );
 
-    close.addEventListener('click', cerrarModal);
 
-    cancel.addEventListener('click', cerrarModal);
+    cancel.addEventListener(
+        'click',
+        cerrarModal
+    );
 
 
+    modal.addEventListener(
+        'click',
+        function (e) {
 
-    modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
 
-        if (e.target === modal) cerrarModal();
+                cerrarModal();
 
-    });
-
-
-/*
-    // ================= AÑO -> MARCAS =================
-
-
-
-    yearSelect.addEventListener('change', async function () {
-
-
-
-        brandSelect.disabled = true;
-
-        modelSelect.disabled = true;
-
-        engineSelect.disabled = true;
-
-
-
-        brandSelect.innerHTML = '<option>Cargando...</option>';
-
-        modelSelect.innerHTML = '<option>Primero selecciona la marca</option>';
-
-        engineSelect.innerHTML = '<option>Primero selecciona el modelo</option>';
-
-
-
-        if (!this.value) return;
-
-
-
-        const brands = await fetch(`/catalog/marcas/${this.value}`)
-
-            .then(r => r.json());
-
-
-
-        brandSelect.innerHTML = '<option value="">Selecciona una marca</option>';
-
-
-
-        brands.forEach(brand => {
-
-            brandSelect.innerHTML += `<option value="${brand}">${brand}</option>`;
-
-        });
-
-
-
-        brandSelect.disabled = false;
-
-
-
-    });
-
-
-
-    // ================= MARCA -> MODELOS =================
-
-
-
-    brandSelect.addEventListener('change', async function () {
-
-
-
-        modelSelect.disabled = true;
-
-        engineSelect.disabled = true;
-
-
-
-        modelSelect.innerHTML = '<option>Cargando...</option>';
-
-        engineSelect.innerHTML = '<option>Primero selecciona el modelo</option>';
-
-
-
-        if (!this.value) return;
-
-
-
-        const models = await fetch(`/catalog/modelos/${yearSelect.value}/${encodeURIComponent(this.value)}`)
-
-            .then(r => r.json());
-
-
-
-        modelSelect.innerHTML = '<option value="">Selecciona un modelo</option>';
-
-
-
-        models.forEach(model => {
-
-            modelSelect.innerHTML += `<option value="${model}">${model}</option>`;
-
-        });
-
-
-
-        modelSelect.disabled = false;
-
-
-
-    });
-
-
-
-    // ================= MODELO -> MOTORES =================
-
-
-
-    modelSelect.addEventListener('change', async function () {
-
-
-
-        engineSelect.disabled = true;
-
-        engineSelect.innerHTML = '<option>Cargando...</option>';
-
-
-
-        if (!this.value) return;
-
-
-
-        const engines = await fetch(`/catalog/motores/${yearSelect.value}/${encodeURIComponent(brandSelect.value)}/${encodeURIComponent(this.value)}`)
-
-            .then(r => r.json());
-
-
-
-        engineSelect.innerHTML = '<option value="">Selecciona un motor</option>';
-
-
-
-        engines.forEach(engine => {
-
-            engineSelect.innerHTML += `<option value="${engine}">${engine}</option>`;
-
-        });
-
-
-
-        engineSelect.disabled = false;
-
-
-
-    });
-
-
-*/
-    // ================= GUARDAR =================
-
-
-
-    form.addEventListener('submit', async function (e) {
-
-
-
-    e.preventDefault();
-
-
-
-    try {
-
-
-
-        const data = new FormData(form);
-
-
-
-        const response = await fetch('/admin/vehiculos/ajax', {
-
-
-
-            method: 'POST',
-
-
-
-            headers: {
-
-                'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
-
-                'Accept': 'application/json'
-
-            },
-
-
-
-            body: data
-
-
-
-        });
-
-
-
-        const result = await response.json();
-
-
-
-        if (!response.ok) {
-
-            console.error(result);
-
-            alert('Error al guardar el vehículo.');
-
-            return;
+            }
 
         }
+    );
 
 
+    /* =====================================================
+       GUARDAR VEHÍCULO
+    ===================================================== */
 
-        const texto = `${result.vehicle.brand} ${result.vehicle.model} (${result.vehicle.year})`;
+    form.addEventListener(
+        'submit',
+        async function (e) {
 
-
-
-        vehicleSelect.appendChild(
-
-            new Option(texto, result.vehicle.id, true, true)
-
-        );
-
+            e.preventDefault();
 
 
-        cerrarModal();
+            try {
+
+                const data =
+                    new FormData(form);
 
 
+                const response =
+                    await fetch(
+                        '/admin/vehiculos/ajax',
+                        {
+                            method: 'POST',
 
-    } catch (error) {
+                            headers: {
+                                'X-CSRF-TOKEN':
+                                    form.querySelector(
+                                        'input[name="_token"]'
+                                    ).value,
+
+                                'Accept':
+                                    'application/json'
+                            },
+
+                            body: data
+                        }
+                    );
 
 
-
-        console.error(error);
-
-        alert('Ocurrió un error. Revisa la consola (F12).');
+                const result =
+                    await response.json();
 
 
+                if (!response.ok) {
 
-    }
+                    console.error(result);
+
+                    alert(
+                        'Error al guardar el vehículo.'
+                    );
+
+                    return;
+
+                }
 
 
+                const texto =
+                    `${result.vehicle.brand} ${result.vehicle.model} (${result.vehicle.year})`;
 
-});
+
+                vehicleSelect.appendChild(
+                    new Option(
+                        texto,
+                        result.vehicle.id,
+                        true,
+                        true
+                    )
+                );
 
 
+                currentVehicles.push(
+                    result.vehicle
+                );
+
+
+                actualizarKilometraje();
+
+
+                cerrarModal();
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    'Ocurrió un error. Revisa la consola (F12).'
+                );
+
+            }
+
+        }
+    );
 
 });
 
 </script>
 
+</body>
 
-
-</x-layouts.app>
+</html>

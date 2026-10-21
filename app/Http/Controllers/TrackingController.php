@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 
 class TrackingController extends Controller
 {
+    public function index()
+    {
+        return view('tracking');
+    }
+
     public function track(Request $request)
     {
         $request->validate([

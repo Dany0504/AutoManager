@@ -10,17 +10,29 @@ use Illuminate\Support\Facades\Auth;
 class ClientVehicleController extends Controller
 {
     public function index()
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        $client = $user->client;
+    $client = $user->client;
 
-        $vehicles = $client
-            ? $client->vehicles()->latest()->get()
-            : collect();
+    // Si todavía no existe el registro del cliente,
+    // lo creamos automáticamente.
+    if (!$client) {
 
-        return view('cliente.vehiculos', compact('vehicles'));
+        $client = Client::create([
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $user->phone ?? '',
+        ]);
     }
+
+    $vehicles = Vehicle::where('client_id', $client->id)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return view('cliente.vehiculos', compact('vehicles'));
+}
 
     public function store(Request $request)
     {
@@ -45,7 +57,7 @@ class ClientVehicleController extends Controller
                 'user_id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'phone' => $user->phone,
+                'phone' => $user->phone ?? '',
             ]);
         }
 
@@ -64,6 +76,8 @@ class ClientVehicleController extends Controller
             ->route('cliente.vehiculos')
             ->with('success', 'Vehículo agregado correctamente.');
     }
+    
+    
     public function edit(Vehicle $vehicle)
 {
     $client = Auth::user()->client;
