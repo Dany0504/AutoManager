@@ -1,12 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>AutoManager - Mecánico</title>
+    <title>AutoManager - MecÃ¡nico</title>
 
     <style>
+
         * {
             margin: 0;
             padding: 0;
@@ -14,9 +16,9 @@
         }
 
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #ffffff;
-            color: #111111;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #111;
         }
 
         .layout {
@@ -24,412 +26,420 @@
             min-height: 100vh;
         }
 
-        /* =========================
-           SIDEBAR
-        ========================== */
+        /* SIDEBAR */
 
         .sidebar {
-            width: 175px;
-            min-height: 100vh;
-            background: #111111;
-            color: #ffffff;
-
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
+            width: 220px;
+            background: #050505;
+            color: white;
 
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
+
+            flex-shrink: 0;
+        }
+
+        .sidebar-top {
+            padding: 18px 0;
         }
 
         .brand {
-            height: 58px;
             display: flex;
             align-items: center;
-            padding: 0 18px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            gap: 10px;
+
+            padding: 0 18px 20px;
+            border-bottom: 1px solid #1d1d1d;
         }
 
-        .brand-letter {
-            font-size: 12px;
-            margin-right: 17px;
-        }
+        .brand-box {
+            width: 26px;
+            height: 26px;
 
-        .brand-name {
-            font-size: 12px;
+            border-radius: 4px;
+            background: #e11d2e;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 13px;
             font-weight: bold;
         }
 
-        .brand-role {
-            display: block;
-            font-size: 8px;
-            font-weight: normal;
-            color: #9b9b9b;
-            margin-top: 2px;
+        .brand-text h2 {
+            font-size: 18px;
+        }
+
+        .brand-text p {
+            color: #aaa;
+            font-size: 12px;
+            margin-top: 3px;
         }
 
         .menu {
-            padding-top: 10px;
+            margin-top: 8px;
         }
 
         .menu a {
             display: block;
-            padding: 10px 12px;
-            color: #bdbdbd;
+            padding: 14px 18px;
+
+            color: white;
             text-decoration: none;
-            font-size: 12px;
+
+            font-size: 15px;
+
             transition: 0.2s;
         }
 
         .menu a:hover {
-            background: #1f1f1f;
-            color: #ffffff;
+            background: #111;
         }
 
         .menu a.active {
-            background: #292929;
-            color: #ffffff;
-            font-weight: bold;
+            background: #1a1a1a;
+            border-left: 4px solid #e11d2e;
+            padding-left: 14px;
         }
 
-        .sidebar-footer {
-            margin-top: auto;
-            padding: 13px 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        .sidebar-bottom {
+            padding: 18px;
+            border-top: 1px solid #1d1d1d;
         }
 
-        .session-label {
-            font-size: 9px;
-            color: #777777;
-            margin-bottom: 5px;
+        .sidebar-bottom p {
+            color: #aaa;
+            font-size: 12px;
+            margin-bottom: 6px;
         }
 
-        .mechanic-name {
-            font-size: 11px;
-            font-weight: bold;
-            color: #ffffff;
-            margin-bottom: 17px;
+        .sidebar-bottom h4 {
+            font-size: 17px;
+            margin-bottom: 14px;
         }
 
-        .collapse-link {
+        .sidebar-bottom a,
+        .sidebar-bottom button {
             display: block;
-            color: #888888;
+
+            color: #bbb;
             text-decoration: none;
-            font-size: 10px;
-            margin-bottom: 17px;
-        }
 
-        .collapse-link:hover {
-            color: #ffffff;
-        }
+            font-size: 14px;
+            margin-top: 10px;
 
-        .logout-form {
-            margin: 0;
-        }
-
-        .logout-button {
-            background: transparent;
+            background: none;
             border: none;
-            color: #888888;
-            font-size: 10px;
+
             cursor: pointer;
             padding: 0;
         }
 
-        .logout-button:hover {
-            color: #ffffff;
+        .sidebar-bottom a:hover,
+        .sidebar-bottom button:hover {
+            color: white;
         }
 
-        /* =========================
-           CONTENIDO PRINCIPAL
-        ========================== */
+        /* MAIN */
 
         .main {
-            margin-left: 175px;
-            width: calc(100% - 175px);
-            min-height: 100vh;
+            flex: 1;
+            min-width: 0;
         }
 
-        /* =========================
-           HEADER
-        ========================== */
+        .topbar {
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
 
-        .header {
-            height: 83px;
-            border-bottom: 1px solid #e7e7e7;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            padding: 0 27px;
+            padding: 24px 28px 18px;
         }
 
-        .header-title h1 {
-            font-size: 20px;
-            font-weight: 700;
+        .topbar h1 {
+            font-size: 24px;
             margin-bottom: 4px;
         }
 
-        .header-title p {
-            color: #777777;
-            font-size: 11px;
+        .topbar p {
+            color: #777;
+            font-size: 14px;
         }
-
-        .header-stats {
-            display: flex;
-            align-items: center;
-            gap: 28px;
-            text-align: center;
-        }
-
-        .header-stat-number {
-            font-size: 20px;
-            font-weight: bold;
-            line-height: 1;
-        }
-
-        .header-stat-number.red {
-            color: #e3262e;
-        }
-
-        .header-stat-label {
-            margin-top: 5px;
-            color: #777777;
-            font-size: 9px;
-        }
-
-        /* =========================
-           AGENDA
-        ========================== */
 
         .content {
-            padding: 26px 27px;
+            padding: 28px;
         }
 
-        .appointment {
-            width: 100%;
-            min-height: 66px;
+        /* STATS */
 
-            border: 1px solid #e2e2e2;
-            margin-bottom: 8px;
-
+        .stats {
             display: grid;
-            grid-template-columns: 85px 1.1fr 2fr 130px;
-            align-items: center;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
 
-            padding: 0 16px;
-            background: #ffffff;
+            margin-bottom: 24px;
         }
 
-        .time {
-            height: 38px;
+        .stat-card {
+            background: white;
 
-            display: flex;
-            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 10px;
 
-            border-right: 1px solid #e5e5e5;
+            padding: 20px;
+        }
 
-            font-family: Consolas, monospace;
-            font-size: 12px;
+        .stat-card span {
+            color: #777;
+            font-size: 13px;
+        }
+
+        .stat-card strong {
+            display: block;
+
+            margin-top: 8px;
+
+            font-size: 28px;
+        }
+
+        /* SECTION */
+
+        .section {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .section-header h2 {
+            font-size: 18px;
+        }
+
+        .section-header p {
+            color: #777;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        /* TABLE */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        thead {
+            background: #050505;
+            color: white;
+        }
+
+        th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #fafafa;
+        }
+
+        /* STATUS */
+
+        .status-form select {
+            padding: 7px 10px;
+
+            border: 1px solid #ddd;
+            border-radius: 8px;
+
+            background: white;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            cursor: pointer;
+            outline: none;
+        }
+
+        .status-form select:focus {
+            border-color: #e11d2e;
+            box-shadow: 0 0 0 3px rgba(225, 29, 46, 0.10);
+        }
+
+        /* FOLIO */
+
+        .folio {
             font-weight: bold;
+            color: #e11d2e;
         }
 
-        .client {
-            padding-left: 17px;
+        /* SUCCESS */
+
+        .success-message {
+            margin-bottom: 20px;
+
+            padding: 12px 16px;
+
+            background: #dcfce7;
+            color: #166534;
+
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+
+            font-size: 14px;
+            font-weight: 600;
         }
 
-        .client-name {
-            font-size: 11px;
-            font-weight: bold;
-            margin-bottom: 4px;
+        /* EMPTY */
+
+        .empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: #777;
         }
 
-        .plates {
-            font-family: Consolas, monospace;
-            color: #777777;
-            font-size: 9px;
+        .empty strong {
+            display: block;
+
+            color: #333;
+
+            font-size: 16px;
+
+            margin-bottom: 6px;
         }
 
-        .vehicle {
-            padding-left: 15px;
+        /* RESPONSIVE */
+
+        @media (max-width: 1100px) {
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
         }
 
-        .vehicle-name {
-            font-size: 11px;
-            margin-bottom: 4px;
-        }
+        @media (max-width: 850px) {
 
-        .service {
-            color: #777777;
-            font-size: 9px;
-        }
-
-        .status-container {
-            text-align: right;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 6px 10px;
-            font-size: 9px;
-        }
-
-        .status-progress {
-            background: #e3262e;
-            color: #ffffff;
-            font-weight: bold;
-        }
-
-        .status-waiting {
-            background: #111111;
-            color: #ffffff;
-            font-weight: bold;
-        }
-
-        .status-pending {
-            background: #f4f4f4;
-            color: #777777;
-        }
-
-        /* =========================
-           RESPONSIVE
-        ========================== */
-
-        @media (max-width: 900px) {
-
-            .appointment {
-                grid-template-columns: 70px 1fr 1.5fr 100px;
+            .layout {
+                flex-direction: column;
             }
 
             .sidebar {
-                width: 160px;
-            }
-
-            .main {
-                margin-left: 160px;
-                width: calc(100% - 160px);
-            }
-        }
-
-        @media (max-width: 700px) {
-
-            .sidebar {
-                display: none;
-            }
-
-            .main {
-                margin-left: 0;
                 width: 100%;
             }
 
-            .header {
-                padding: 0 15px;
+            .menu {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .menu a.active {
+                border-left: 4px solid #e11d2e;
             }
 
             .content {
-                padding: 15px;
+                padding: 18px;
             }
 
-            .appointment {
-                grid-template-columns: 65px 1fr;
-                gap: 10px;
-                padding: 12px;
-            }
-
-            .vehicle {
-                padding-left: 0;
-            }
-
-            .status-container {
-                text-align: left;
-            }
         }
+
+        @media (max-width: 500px) {
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .menu {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 14px;
+            }
+
+        }
+
     </style>
+
 </head>
 
 <body>
 
 <div class="layout">
 
-    <!-- =========================
-         SIDEBAR
-    ========================== -->
+    <!-- SIDEBAR -->
 
     <aside class="sidebar">
 
-        <div class="brand">
+        <div class="sidebar-top">
 
-            <div class="brand-letter">
-                A
-            </div>
+            <div class="brand">
 
-            <div>
-                <div class="brand-name">
-                    AutoManager
+                <div class="brand-box">
+                    A
                 </div>
 
-                <span class="brand-role">
-                    Mecánico
-                </span>
+                <div class="brand-text">
+
+                    <h2>
+                        AutoManager
+                    </h2>
+
+                    <p>
+                        MecÃ¡nico
+                    </p>
+
+                </div>
+
             </div>
+
+            <nav class="menu">
+
+                <a href="{{ route('mecanico.dashboard') }}"
+                   class="active">
+                    Mis citas
+                </a>
+
+            </nav>
 
         </div>
 
+        <div class="sidebar-bottom">
 
-        <nav class="menu">
+            <p>
+                SesiÃ³n activa
+            </p>
 
-            <a href="#" class="active">
-                Agenda del día
+            <h4>
+                {{ auth()->user()->name }}
+            </h4>
+
+            <a href="{{ route('profile.edit') }}">
+                Perfil
             </a>
 
-            <a href="#">
-                Nueva orden
-            </a>
+            <form method="POST"
+                  action="{{ route('logout') }}">
 
-            <a href="#">
-                Detalle de orden
-            </a>
-
-            <a href="#">
-                Cambio de estatus
-            </a>
-
-            <a href="#">
-                Inventario
-            </a>
-
-        </nav>
-
-
-        <div class="sidebar-footer">
-
-            <div class="session-label">
-                Sesión activa
-            </div>
-
-            <div class="mechanic-name">
-                Carlos Mendoza
-            </div>
-
-            <a href="#" class="collapse-link">
-                ← &nbsp; Contraer
-            </a>
-
-
-            <form
-                method="POST"
-                action="{{ route('logout') }}"
-                class="logout-form"
-            >
                 @csrf
 
-                <button
-                    type="submit"
-                    class="logout-button"
-                >
-                    ↻ &nbsp; Cerrar sesión
+                <button type="submit">
+                    â—¦ Cerrar sesiÃ³n
                 </button>
 
             </form>
@@ -439,282 +449,270 @@
     </aside>
 
 
-    <!-- =========================
-         CONTENIDO
-    ========================== -->
+    <!-- MAIN -->
 
     <main class="main">
 
-        <!-- HEADER -->
+        <div class="topbar">
 
-        <header class="header">
+            <h1>
+                Panel del mecÃ¡nico
+            </h1>
 
-            <div class="header-title">
+            <p>
+                Consulta y administra los vehÃ­culos asignados a tu taller.
+            </p>
 
-                <h1>
-                    Agenda del día
-                </h1>
-
-                <p>
-                    Miércoles, 3 de septiembre de 2026
-                </p>
-
-            </div>
+        </div>
 
 
-            <div class="header-stats">
+        <div class="content">
 
-                <div>
+            @if(session('success'))
 
-                    <div class="header-stat-number">
-                        5
-                    </div>
+                <div class="success-message">
+                    {{ session('success') }}
+                </div>
 
-                    <div class="header-stat-label">
-                        Citas
-                    </div>
+            @endif
+
+
+            <!-- STATS -->
+
+            <div class="stats">
+
+                <div class="stat-card">
+
+                    <span>
+                        Citas asignadas
+                    </span>
+
+                    <strong>
+                        {{ $totalCitas }}
+                    </strong>
 
                 </div>
 
 
-                <div>
+                <div class="stat-card">
 
-                    <div class="header-stat-number red">
-                        1
-                    </div>
+                    <span>
+                        Pendientes
+                    </span>
 
-                    <div class="header-stat-label">
-                        En proceso
-                    </div>
-
-                </div>
-
-            </div>
-
-        </header>
-
-
-        <!-- AGENDA -->
-
-        <section class="content">
-
-
-            <!-- CITA 1 -->
-
-            <div class="appointment">
-
-                <div class="time">
-                    08:00
-                </div>
-
-                <div class="client">
-
-                    <div class="client-name">
-                        Ana García
-                    </div>
-
-                    <div class="plates">
-                        ABC-123
-                    </div>
+                    <strong>
+                        {{ $pendientes }}
+                    </strong>
 
                 </div>
 
-                <div class="vehicle">
 
-                    <div class="vehicle-name">
-                        Toyota Corolla 2020
-                    </div>
+                <div class="stat-card">
 
-                    <div class="service">
-                        Cambio de aceite + frenos
-                    </div>
-
-                </div>
-
-                <div class="status-container">
-
-                    <span class="status status-progress">
+                    <span>
                         En proceso
                     </span>
 
-                </div>
-
-            </div>
-
-
-            <!-- CITA 2 -->
-
-            <div class="appointment">
-
-                <div class="time">
-                    10:00
-                </div>
-
-                <div class="client">
-
-                    <div class="client-name">
-                        Roberto Lima
-                    </div>
-
-                    <div class="plates">
-                        DEF-456
-                    </div>
+                    <strong>
+                        {{ $enProceso }}
+                    </strong>
 
                 </div>
 
-                <div class="vehicle">
 
-                    <div class="vehicle-name">
-                        Honda Civic 2019
-                    </div>
+                <div class="stat-card">
 
-                    <div class="service">
-                        Diagnóstico eléctrico
-                    </div>
-
-                </div>
-
-                <div class="status-container">
-
-                    <span class="status status-waiting">
-                        Esperando
+                    <span>
+                        Listos para entrega
                     </span>
 
-                </div>
-
-            </div>
-
-
-            <!-- CITA 3 -->
-
-            <div class="appointment">
-
-                <div class="time">
-                    11:30
-                </div>
-
-                <div class="client">
-
-                    <div class="client-name">
-                        Sofía Reyes
-                    </div>
-
-                    <div class="plates">
-                        GHI-789
-                    </div>
-
-                </div>
-
-                <div class="vehicle">
-
-                    <div class="vehicle-name">
-                        Nissan Sentra 2021
-                    </div>
-
-                    <div class="service">
-                        Alineación y balanceo
-                    </div>
-
-                </div>
-
-                <div class="status-container">
-
-                    <span class="status status-pending">
-                        Pendiente
-                    </span>
+                    <strong>
+                        {{ $listas }}
+                    </strong>
 
                 </div>
 
             </div>
 
 
-            <!-- CITA 4 -->
+            <!-- CITAS -->
 
-            <div class="appointment">
+            <div class="section">
 
-                <div class="time">
-                    14:00
-                </div>
+                <div class="section-header">
 
-                <div class="client">
+                    <h2>
+                        VehÃ­culos asignados
+                    </h2>
 
-                    <div class="client-name">
-                        Marco Peña
-                    </div>
-
-                    <div class="plates">
-                        JKL-012
-                    </div>
+                    <p>
+                        AquÃ­ aparecerÃ¡n las citas que el administrador te haya asignado.
+                    </p>
 
                 </div>
 
-                <div class="vehicle">
 
-                    <div class="vehicle-name">
-                        Ford F-150 2017
-                    </div>
+                <div class="table-wrapper">
 
-                    <div class="service">
-                        Revisión general
-                    </div>
+                    @if($appointments->count())
 
-                </div>
+                        <table>
 
-                <div class="status-container">
+                            <thead>
 
-                    <span class="status status-pending">
-                        Pendiente
-                    </span>
+                                <tr>
+
+                                    <th>
+                                        Folio
+                                    </th>
+
+                                    <th>
+                                        Cliente
+                                    </th>
+
+                                    <th>
+                                        VehÃ­culo
+                                    </th>
+
+                                    <th>
+                                        Servicio
+                                    </th>
+
+                                    <th>
+                                        Fecha
+                                    </th>
+
+                                    <th>
+                                        Hora
+                                    </th>
+
+                                    <th>
+                                        Estado
+                                    </th>
+
+                                    <th>
+                                        Acciones
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                @foreach($appointments as $appointment)
+
+                                    <tr>
+
+                                        <td>
+                                            <span class="folio">
+                                                {{ $appointment->folio }}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {{ $appointment->client->name }}
+                                        </td>
+
+                                        <td>
+                                            {{ $appointment->vehicle->brand }}
+                                            {{ $appointment->vehicle->model }}
+                                            ({{ $appointment->vehicle->year }})
+                                        </td>
+
+                                        <td>
+                                            {{ $appointment->service_type }}
+                                        </td>
+
+                                        <td>
+                                            {{ $appointment->appointment_date }}
+                                        </td>
+
+                                        <td>
+                                            {{ $appointment->appointment_time }}
+                                        </td>
+
+                                        <td>
+
+    @switch($appointment->status)
+
+        @case('pendiente')
+            Pendiente
+            @break
+
+        @case('diagnostico')
+            DiagnÃ³stico
+            @break
+
+        @case('esperando_aprobacion')
+            Esperando autorizaciÃ³n
+            @break
+
+        @case('en_proceso')
+            En proceso
+            @break
+
+        @case('control_calidad')
+            Control de calidad
+            @break
+
+        @case('listo')
+            Listo para entrega
+            @break
+
+        @case('rechazado')
+            Rechazado
+            @break
+
+        @default
+            {{ ucfirst($appointment->status) }}
+
+    @endswitch
+
+
+                                        </td>
+
+                                        <td>
+
+    <a
+        href="{{ route('mecanico.citas.show', $appointment) }}"
+        class="btn-edit"
+    >
+        Abrir orden
+    </a>
+
+</td>
+
+                                    </tr>
+
+                                @endforeach
+
+                            </tbody>
+
+                        </table>
+
+                    @else
+
+                        <div class="empty">
+
+                            <strong>
+                                No tienes vehÃ­culos asignados
+                            </strong>
+
+                            <span>
+                                Cuando el administrador te asigne una cita aparecerÃ¡ aquÃ­.
+                            </span>
+
+                        </div>
+
+                    @endif
 
                 </div>
 
             </div>
 
-
-            <!-- CITA 5 -->
-
-            <div class="appointment">
-
-                <div class="time">
-                    16:00
-                </div>
-
-                <div class="client">
-
-                    <div class="client-name">
-                        Valeria Ruiz
-                    </div>
-
-                    <div class="plates">
-                        MNO-345
-                    </div>
-
-                </div>
-
-                <div class="vehicle">
-
-                    <div class="vehicle-name">
-                        Chevrolet Spark 2022
-                    </div>
-
-                    <div class="service">
-                        Cambio de aceite
-                    </div>
-
-                </div>
-
-                <div class="status-container">
-
-                    <span class="status status-pending">
-                        Pendiente
-                    </span>
-
-                </div>
-
-            </div>
-
-
-        </section>
+        </div>
 
     </main>
 

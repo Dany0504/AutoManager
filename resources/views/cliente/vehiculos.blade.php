@@ -6,6 +6,8 @@
 
     <title>Mis vehículos - AutoManager</title>
 
+    
+
     <style>
         * {
             box-sizing: border-box;
@@ -204,14 +206,27 @@
             font-weight: bold;
         }
 
-        .field input {
-            width: 100%;
-            height: 42px;
-            border: 2px solid #222;
-            padding: 0 12px;
-            font-size: 14px;
-            outline: none;
-        }
+        .field input,
+.field select {
+    width: 100%;
+    height: 42px;
+    border: 2px solid #222;
+    background: white;
+    padding: 0 12px;
+    font-size: 14px;
+    outline: none;
+}
+
+.field input:focus,
+.field select:focus {
+    border-color: #e52b2b;
+}
+
+.field select:disabled {
+    background: #f3f3f3;
+    color: #999;
+    cursor: not-allowed;
+}
 
         .field input:focus {
             border-color: #e52b2b;
@@ -339,6 +354,44 @@
                 align-items: flex-start;
             }
         }
+
+        .vehicles-section {
+    margin-top: 20px;
+}
+
+.field select {
+    width: 100%;
+    height: 42px;
+    border: 2px solid #222;
+    background: white;
+    padding: 0 12px;
+    font-size: 14px;
+    outline: none;
+}
+
+.field select:focus {
+    border-color: #e52b2b;
+}
+
+.field select:disabled {
+    background: #f3f3f3;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+@media (max-width: 800px) {
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
     </style>
 </head>
 
@@ -359,39 +412,47 @@
 
         <nav class="menu">
 
-            <a href="{{ route('cliente.dashboard') }}">
-                Inicio
-            </a>
+    <a href="{{ route('cliente.dashboard') }}"
+       class="{{ request()->routeIs('cliente.dashboard') ? 'active' : '' }}">
+        Inicio
+    </a>
 
-            <a href="{{ route('cliente.vehiculos') }}" class="active">
-                Mis vehículos
-            </a>
+    <a href="{{ route('cliente.vehiculos') }}"
+       class="{{ request()->routeIs('cliente.vehiculos*') ? 'active' : '' }}">
+        Mis vehículos
+    </a>
 
-            <a href="{{ route('cliente.citas.create') }}">
-                Agendar cita
-            </a>
+    <a href="{{ route('cliente.citas.create') }}"
+       class="{{ request()->routeIs('cliente.citas.create') ? 'active' : '' }}">
+        Agendar cita
+    </a>
 
-            <a href="#">
-                Mis citas
-            </a>
+    <a href="{{ route('cliente.citas.index') }}"
+       class="{{ request()->routeIs('cliente.citas.*') && !request()->routeIs('cliente.citas.create') ? 'active' : '' }}">
+        Mis citas
+    </a>
 
-            <a href="#">
-                Rastrear orden
-            </a>
+    <a href="{{ route('cliente.rastrear-orden') }}"
+       class="{{ request()->routeIs('cliente.rastrear-orden') ? 'active' : '' }}">
+        Rastrear orden
+    </a>
 
-            <a href="#">
-                Historial
-            </a>
+    <a href="{{ route('cliente.historial') }}"
+       class="{{ request()->routeIs('cliente.historial') ? 'active' : '' }}">
+        Historial
+    </a>
 
-            <a href="#">
-                Autorizaciones
-            </a>
+    <a href="{{ route('cliente.autorizaciones') }}"
+       class="{{ request()->routeIs('cliente.autorizaciones*') ? 'active' : '' }}">
+        Autorizaciones
+    </a>
 
-            <a href="{{ route('profile.edit') }}">
-                Perfil
-            </a>
+    <a href="{{ route('profile.edit') }}"
+       class="{{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+        Perfil
+    </a>
 
-        </nav>
+</nav>
 
         <div class="session">
 
@@ -441,324 +502,314 @@
 
         <section class="content">
 
-            {{-- MENSAJE DE ÉXITO --}}
+    {{-- MENSAJES --}}
 
-            @if(session('success'))
+    @if(session('success'))
+        <div class="success">
+            {{ session('success') }}
+        </div>
+    @endif
 
-                <div class="success">
-                    {{ session('success') }}
-                </div>
 
+    @if($errors->any())
+        <div class="errors">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+
+    {{-- =========================
+         FORMULARIO
+    ========================== --}}
+
+    <div
+        id="formularioVehiculo"
+        class="vehicle-form"
+        style="{{ request('nuevo') || isset($vehicle) || $errors->any() ? '' : 'display:none;' }}"
+    >
+
+        <h3>
+            {{ isset($vehicle) ? 'Editar vehículo' : 'Nuevo vehículo' }}
+        </h3>
+
+        <form
+            method="POST"
+            action="{{
+                isset($vehicle)
+                    ? route('cliente.vehiculos.update', $vehicle)
+                    : route('cliente.vehiculos.store')
+            }}"
+        >
+
+            @csrf
+
+            @if(isset($vehicle))
+                @method('PUT')
             @endif
 
 
-            {{-- ERRORES --}}
+            <div class="form-grid">
 
-            @if($errors->any())
+                {{-- AÑO --}}
 
-                <div class="errors">
+                <div class="field">
 
-                    <ul>
+                    <label>Año</label>
 
-                        @foreach($errors->all() as $error)
+                    <select
+                        id="yearSelect"
+                        name="year"
+                        required
+                    >
 
-                            <li>
-                                {{ $error }}
-                            </li>
+                        <option value="">
+                            Selecciona un año
+                        </option>
 
-                        @endforeach
+                        @for($year = date('Y'); $year >= 1995; $year--)
 
-                    </ul>
+                            <option
+                                value="{{ $year }}"
+                                @selected(old('year', $vehicle->year ?? '') == $year)
+                            >
+                                {{ $year }}
+                            </option>
+
+                        @endfor
+
+                    </select>
 
                 </div>
 
-            @endif
+
+                {{-- MARCA --}}
+
+                <div class="field">
+
+                    <label>Marca</label>
+
+                    <select
+                        id="brandSelect"
+                        name="brand"
+                        required
+                        disabled
+                    >
+
+                        <option value="">
+                            Primero selecciona el año
+                        </option>
+
+                    </select>
+
+                </div>
 
 
-            {{-- =========================
-                 FORMULARIO
-                 AGREGAR / EDITAR
-            ========================== --}}
+                {{-- MODELO --}}
 
-            <div
-                id="formularioVehiculo"
-                class="vehicle-form"
-                style="{{ isset($vehicle) || $errors->any() ? '' : 'display:none;' }}"
-            >
+                <div class="field">
 
-                <h3>
-                    {{ isset($vehicle) ? 'Editar vehículo' : 'Nuevo vehículo' }}
-                </h3>
+                    <label>Modelo</label>
 
-                <form
-                    method="POST"
-                    action="{{ isset($vehicle)
-                        ? route('cliente.vehiculos.update', $vehicle)
-                        : route('cliente.vehiculos.store') }}"
-                >
+                    <select
+                        id="modelSelect"
+                        name="model"
+                        required
+                        disabled
+                    >
 
-                    @csrf
+                        <option value="">
+                            Primero selecciona la marca
+                        </option>
 
-                    @if(isset($vehicle))
-                        @method('PUT')
-                    @endif
+                    </select>
+
+                </div>
 
 
-                    <div class="form-grid">
+                {{-- MOTOR --}}
 
-                        {{-- MARCA --}}
+                <div class="field">
 
-                        <div class="field">
+                    <label>Motor</label>
 
-                            <label>
-                                Marca
-                            </label>
+                    <select
+                        id="engineSelect"
+                        name="engine"
+                        required
+                        disabled
+                    >
 
-                            <input
-                                type="text"
-                                name="brand"
-                                value="{{ old('brand', $vehicle->brand ?? '') }}"
-                                placeholder="Marca"
-                                required
-                            >
+                        <option value="">
+                            Primero selecciona el modelo
+                        </option>
 
-                        </div>
+                    </select>
 
-
-                        {{-- MODELO --}}
-
-                        <div class="field">
-
-                            <label>
-                                Modelo
-                            </label>
-
-                            <input
-                                type="text"
-                                name="model"
-                                value="{{ old('model', $vehicle->model ?? '') }}"
-                                placeholder="Modelo"
-                                required
-                            >
-
-                        </div>
+                </div>
 
 
-                        {{-- AÑO --}}
+                {{-- PLACAS --}}
 
-                        <div class="field">
+                <div class="field">
 
-                            <label>
-                                Año
-                            </label>
+                    <label>Placas</label>
 
-                            <input
-                                type="number"
-                                name="year"
-                                value="{{ old('year', $vehicle->year ?? '') }}"
-                                placeholder="Año"
-                                min="1950"
-                                max="2035"
-                                required
-                            >
+                    <input
+                        type="text"
+                        name="plates"
+                        value="{{ old('plates', $vehicle->plates ?? '') }}"
+                        placeholder="Placas"
+                    >
 
-                        </div>
+                </div>
 
 
-                        {{-- MOTOR --}}
+                {{-- KILOMETRAJE --}}
 
-                        <div class="field">
+                <div class="field">
 
-                            <label>
-                                Motor
-                            </label>
+                    <label>Kilometraje</label>
 
-                            <input
-                                type="text"
-                                name="engine"
-                                value="{{ old('engine', $vehicle->engine ?? '') }}"
-                                placeholder="Motor"
-                                required
-                            >
+                    <input
+                        type="number"
+                        name="mileage"
+                        value="{{ old('mileage', $vehicle->mileage ?? '') }}"
+                        placeholder="Kilometraje"
+                        min="0"
+                        required
+                    >
 
-                        </div>
-
-
-                        {{-- PLACAS --}}
-
-                        <div class="field">
-
-                            <label>
-                                Placas
-                            </label>
-
-                            <input
-                                type="text"
-                                name="plates"
-                                value="{{ old('plates', $vehicle->plates ?? '') }}"
-                                placeholder="Placas"
-                            >
-
-                        </div>
+                </div>
 
 
-                        {{-- KILOMETRAJE --}}
+                {{-- COLOR --}}
 
-                        <div class="field">
+                <div class="field">
 
-                            <label>
-                                Kilometraje
-                            </label>
+                    <label>Color</label>
 
-                            <input
-                                type="number"
-                                name="mileage"
-                                value="{{ old('mileage', $vehicle->mileage ?? '') }}"
-                                placeholder="Kilometraje"
-                                min="0"
-                                required
-                            >
+                    <input
+                        type="text"
+                        name="color"
+                        value="{{ old('color', $vehicle->color ?? '') }}"
+                        placeholder="Color"
+                        required
+                    >
 
-                        </div>
-
-
-                        {{-- COLOR --}}
-
-                        <div class="field">
-
-                            <label>
-                                Color
-                            </label>
-
-                            <input
-                                type="text"
-                                name="color"
-                                value="{{ old('color', $vehicle->color ?? '') }}"
-                                placeholder="Color"
-                                required
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- BOTONES FORMULARIO --}}
-
-                    <div class="form-actions">
-
-                        <button
-                            type="submit"
-                            class="btn-red"
-                        >
-                            {{ isset($vehicle) ? 'Guardar cambios' : 'Guardar' }}
-                        </button>
-
-
-                        @if(isset($vehicle))
-
-                            <a
-                                href="{{ route('cliente.vehiculos') }}"
-                                class="btn-cancel"
-                                style="text-decoration:none; color:#111;"
-                            >
-                                Cancelar
-                            </a>
-
-                        @else
-
-                            <button
-                                type="button"
-                                class="btn-cancel"
-                                onclick="ocultarFormulario()"
-                            >
-                                Cancelar
-                            </button>
-
-                        @endif
-
-                    </div>
-
-                </form>
+                </div>
 
             </div>
 
 
-            {{-- =========================
-                 LISTADO DE VEHÍCULOS
-            ========================== --}}
+            <div class="form-actions">
 
-            @forelse($vehicles as $vehicle)
-
-                <div class="vehicle-item">
-
-                    <div class="vehicle-left">
-
-                        <div>
-
-                            {{-- NOMBRE DEL VEHÍCULO --}}
-
-                            <div class="vehicle-name">
-
-                                {{ $vehicle->brand }}
-                                {{ $vehicle->model }}
-                                {{ $vehicle->year }}
-
-                            </div>
+                <button
+                    type="submit"
+                    class="btn-red"
+                >
+                    {{ isset($vehicle) ? 'Guardar cambios' : 'Guardar' }}
+                </button>
 
 
-                            {{-- INFORMACIÓN DEL VEHÍCULO --}}
+                <button
+                    type="button"
+                    class="btn-cancel"
+                    onclick="ocultarFormulario()"
+                >
+                    Cancelar
+                </button>
 
-                            <div class="vehicle-details">
+            </div>
 
-                                <span class="plates">
-                                    {{ $vehicle->plates ?: 'Sin placas' }}
-                                </span>
+        </form>
+
+    </div>
+
+
+    {{-- =========================
+         LISTADO DE VEHÍCULOS
+    ========================== --}}
+
+    <div class="vehicles-section">
+
+        @forelse($vehicles as $vehicle)
+
+            <div class="vehicle-item">
+
+                <div class="vehicle-left">
+
+                    <div>
+
+                        <div class="vehicle-name">
+
+                            {{ $vehicle->brand }}
+                            {{ $vehicle->model }}
+                            {{ $vehicle->year }}
+
+                        </div>
+
+
+                        <div class="vehicle-details">
+
+                            <span class="plates">
+                                {{ $vehicle->plates ?: 'Sin placas' }}
+                            </span>
+
+                            <span>
+                                {{ number_format($vehicle->mileage ?? 0) }} km
+                            </span>
+
+                            <span>
+                                {{ $vehicle->color ?: 'Sin color' }}
+                            </span>
+
+                            @if($vehicle->engine)
 
                                 <span>
-                                    {{ number_format($vehicle->mileage ?? 0) }} km
+                                    {{ $vehicle->engine }}
                                 </span>
 
-                                <span>
-                                    {{ $vehicle->color ?: 'Sin color' }}
-                                </span>
-
-                            </div>
+                            @endif
 
                         </div>
 
                     </div>
 
-
-                    {{-- EDITAR --}}
-
-                    <a
-                        href="{{ route('cliente.vehiculos.edit', $vehicle) }}"
-                        class="edit-link"
-                    >
-                        Editar
-                    </a>
-
                 </div>
 
 
-            @empty
+                <a
+                    href="{{ route('cliente.vehiculos.edit', $vehicle) }}"
+                    class="edit-link"
+                >
+                    Editar
+                </a>
 
-                <div class="empty">
+            </div>
 
-                    <strong>
-                        No tienes vehículos registrados.
-                    </strong>
+        @empty
 
-                    <p>
-                        Presiona "+ Agregar vehículo" para registrar el primero.
-                    </p>
+            <div class="empty">
 
-                </div>
+                <strong>
+                    No tienes vehículos registrados.
+                </strong>
 
-            @endforelse
+                <p>
+                    Agrega tu primer vehículo para poder agendar una cita.
+                </p>
 
-        </section>
+            </div>
+
+        @endforelse
+
+    </div>
+
+</section>
 
     </main>
 
@@ -771,18 +822,281 @@
 
 <script>
 
-    function mostrarFormulario() {
+function mostrarFormulario() {
+    document.getElementById('formularioVehiculo').style.display = 'block';
+}
 
-        document.getElementById('formularioVehiculo').style.display = 'block';
+function ocultarFormulario() {
+    document.getElementById('formularioVehiculo').style.display = 'none';
+}
 
+
+// ===============================
+// CATÁLOGO DE VEHÍCULOS
+// ===============================
+
+const yearSelect = document.getElementById('yearSelect');
+const brandSelect = document.getElementById('brandSelect');
+const modelSelect = document.getElementById('modelSelect');
+const engineSelect = document.getElementById('engineSelect');
+
+
+// ===============================
+// AÑO → MARCAS
+// ===============================
+
+yearSelect.addEventListener('change', async function () {
+
+    brandSelect.disabled = true;
+    modelSelect.disabled = true;
+    engineSelect.disabled = true;
+
+    brandSelect.innerHTML =
+        '<option value="">Cargando marcas...</option>';
+
+    modelSelect.innerHTML =
+        '<option value="">Primero selecciona la marca</option>';
+
+    engineSelect.innerHTML =
+        '<option value="">Primero selecciona el modelo</option>';
+
+    if (!this.value) {
+        return;
     }
 
+    try {
 
-    function ocultarFormulario() {
+        const response = await fetch(
+            `/catalog/marcas/${this.value}`
+        );
 
-        document.getElementById('formularioVehiculo').style.display = 'none';
+        const brands = await response.json();
 
+        brandSelect.innerHTML =
+            '<option value="">Selecciona una marca</option>';
+
+        brands.forEach(brand => {
+
+            brandSelect.innerHTML += `
+                <option value="${brand}">
+                    ${brand}
+                </option>
+            `;
+
+        });
+
+        brandSelect.disabled = false;
+
+    } catch (error) {
+
+        console.error(error);
+
+        brandSelect.innerHTML =
+            '<option value="">Error al cargar marcas</option>';
     }
+});
+
+
+// ===============================
+// MARCA → MODELOS
+// ===============================
+
+brandSelect.addEventListener('change', async function () {
+
+    modelSelect.disabled = true;
+    engineSelect.disabled = true;
+
+    modelSelect.innerHTML =
+        '<option value="">Cargando modelos...</option>';
+
+    engineSelect.innerHTML =
+        '<option value="">Primero selecciona el modelo</option>';
+
+    if (!this.value) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `/catalog/modelos/${yearSelect.value}/${encodeURIComponent(this.value)}`
+        );
+
+        const models = await response.json();
+
+        modelSelect.innerHTML =
+            '<option value="">Selecciona un modelo</option>';
+
+        models.forEach(model => {
+
+            modelSelect.innerHTML += `
+                <option value="${model}">
+                    ${model}
+                </option>
+            `;
+
+        });
+
+        modelSelect.disabled = false;
+
+    } catch (error) {
+
+        console.error(error);
+
+        modelSelect.innerHTML =
+            '<option value="">Error al cargar modelos</option>';
+    }
+});
+
+
+// ===============================
+// MODELO → MOTORES
+// ===============================
+
+modelSelect.addEventListener('change', async function () {
+
+    engineSelect.disabled = true;
+
+    engineSelect.innerHTML =
+        '<option value="">Cargando motores...</option>';
+
+    if (!this.value) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `/catalog/motores/${yearSelect.value}/${encodeURIComponent(brandSelect.value)}/${encodeURIComponent(this.value)}`
+        );
+
+        const engines = await response.json();
+
+        engineSelect.innerHTML =
+            '<option value="">Selecciona un motor</option>';
+
+        engines.forEach(engine => {
+
+            engineSelect.innerHTML += `
+                <option value="${engine}">
+                    ${engine}
+                </option>
+            `;
+
+        });
+
+        engineSelect.disabled = false;
+
+    } catch (error) {
+
+        console.error(error);
+
+        engineSelect.innerHTML =
+            '<option value="">Error al cargar motores</option>';
+    }
+});
+
+
+// ===============================
+// EDITAR VEHÍCULO
+// ===============================
+
+document.addEventListener('DOMContentLoaded', async function () {
+
+    const selectedYear = "{{ old('year', $vehicle->year ?? '') }}";
+    const selectedBrand = "{{ old('brand', $vehicle->brand ?? '') }}";
+    const selectedModel = "{{ old('model', $vehicle->model ?? '') }}";
+    const selectedEngine = "{{ old('engine', $vehicle->engine ?? '') }}";
+
+    if (!selectedYear) {
+        return;
+    }
+
+    yearSelect.value = selectedYear;
+
+    // Cargar marcas
+    const brandResponse = await fetch(
+        `/catalog/marcas/${selectedYear}`
+    );
+
+    const brands = await brandResponse.json();
+
+    brandSelect.innerHTML =
+        '<option value="">Selecciona una marca</option>';
+
+    brands.forEach(brand => {
+
+        brandSelect.innerHTML += `
+            <option
+                value="${brand}"
+                ${brand === selectedBrand ? 'selected' : ''}
+            >
+                ${brand}
+            </option>
+        `;
+
+    });
+
+    brandSelect.disabled = false;
+
+    if (!selectedBrand) {
+        return;
+    }
+
+    // Cargar modelos
+    const modelResponse = await fetch(
+        `/catalog/modelos/${selectedYear}/${encodeURIComponent(selectedBrand)}`
+    );
+
+    const models = await modelResponse.json();
+
+    modelSelect.innerHTML =
+        '<option value="">Selecciona un modelo</option>';
+
+    models.forEach(model => {
+
+        modelSelect.innerHTML += `
+            <option
+                value="${model}"
+                ${model === selectedModel ? 'selected' : ''}
+            >
+                ${model}
+            </option>
+        `;
+
+    });
+
+    modelSelect.disabled = false;
+
+    if (!selectedModel) {
+        return;
+    }
+
+    // Cargar motores
+    const engineResponse = await fetch(
+        `/catalog/motores/${selectedYear}/${encodeURIComponent(selectedBrand)}/${encodeURIComponent(selectedModel)}`
+    );
+
+    const engines = await engineResponse.json();
+
+    engineSelect.innerHTML =
+        '<option value="">Selecciona un motor</option>';
+
+    engines.forEach(engine => {
+
+        engineSelect.innerHTML += `
+            <option
+                value="${engine}"
+                ${engine === selectedEngine ? 'selected' : ''}
+            >
+                ${engine}
+            </option>
+        `;
+
+    });
+
+    engineSelect.disabled = false;
+});
 
 </script>
 

@@ -496,41 +496,51 @@
 
         </div>
 
-        <nav class="menu">
 
-            <a href="{{ route('cliente.dashboard') }}">
-                Inicio
-            </a>
+<nav class="menu">
 
-            <a href="{{ route('cliente.vehiculos') }}">
-                Mis vehículos
-            </a>
+    <a href="{{ route('cliente.dashboard') }}"
+       class="{{ request()->routeIs('cliente.dashboard') ? 'active' : '' }}">
+        Inicio
+    </a>
 
-            <a href="{{ route('cliente.citas.create') }}" class="active">
-                Agendar cita
-            </a>
+    <a href="{{ route('cliente.vehiculos') }}"
+       class="{{ request()->routeIs('cliente.vehiculos*') ? 'active' : '' }}">
+        Mis vehículos
+    </a>
 
-            <a href="#">
-                Mis citas
-            </a>
+    <a href="{{ route('cliente.citas.create') }}"
+       class="{{ request()->routeIs('cliente.citas.create') ? 'active' : '' }}">
+        Agendar cita
+    </a>
 
-            <a href="#">
-                Rastrear orden
-            </a>
+    <a href="{{ route('cliente.citas.index') }}"
+       class="{{ request()->routeIs('cliente.citas.*') && !request()->routeIs('cliente.citas.create') ? 'active' : '' }}">
+        Mis citas
+    </a>
 
-            <a href="#">
-                Historial
-            </a>
+    <a href="{{ route('cliente.rastrear-orden') }}"
+       class="{{ request()->routeIs('cliente.rastrear-orden') ? 'active' : '' }}">
+        Rastrear orden
+    </a>
 
-            <a href="#">
-                Autorizaciones
-            </a>
+    <a href="{{ route('cliente.historial') }}"
+       class="{{ request()->routeIs('cliente.historial') ? 'active' : '' }}">
+        Historial
+    </a>
 
-            <a href="{{ route('profile.edit') }}">
-                Perfil
-            </a>
+    <a href="{{ route('cliente.autorizaciones') }}"
+       class="{{ request()->routeIs('cliente.autorizaciones*') ? 'active' : '' }}">
+        Autorizaciones
+    </a>
 
-        </nav>
+    <a href="{{ route('profile.edit') }}"
+       class="{{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+        Perfil
+    </a>
+
+</nav>
+
 
         <div class="session">
 
@@ -648,44 +658,97 @@
 
                     <div class="field">
 
-                        <label for="vehicle_id">
-                            Vehículo
-                        </label>
+    <label for="vehicle_id">
+        Vehículo
+    </label>
 
-                        <select
-                            name="vehicle_id"
-                            id="vehicle_id"
-                            required
-                        >
+    @if($vehicles->isEmpty())
 
-                            <option value="">
-                                Seleccionar vehículo
-                            </option>
+        <div
+            style="
+                border:2px solid #e52b2b;
+                background:#fff4f4;
+                padding:16px;
+            "
+        >
 
-                            @foreach($vehicles as $vehicle)
+            <strong style="display:block; margin-bottom:6px;">
+                No tienes vehículos registrados
+            </strong>
 
-                                <option
-                                    value="{{ $vehicle->id }}"
-                                    data-brand="{{ $vehicle->brand }}"
-                                    data-model="{{ $vehicle->model }}"
-                                    data-year="{{ $vehicle->year }}"
-                                    data-plates="{{ $vehicle->plates ?: 'Sin placas' }}"
-                                    {{ old('vehicle_id') == $vehicle->id ? 'selected' : '' }}
-                                >
-                                    {{ $vehicle->brand }}
-                                    {{ $vehicle->model }}
-                                    {{ $vehicle->year }}
+            <p style="color:#666; font-size:13px; margin-bottom:14px;">
+                Necesitas registrar al menos un vehículo antes de agendar una cita.
+            </p>
 
-                                    @if($vehicle->plates)
-                                        - {{ $vehicle->plates }}
-                                    @endif
-                                </option>
+            <a
+    href="{{ route('cliente.vehiculos', ['nuevo' => 1]) }}"
+    style="
+        display:inline-block;
+        background:#e52b2b;
+        color:white;
+        padding:11px 16px;
+        text-decoration:none;
+        font-weight:bold;
+    "
+>
+    + Agregar vehículo
+</a>
 
-                            @endforeach
+        </div>
 
-                        </select>
+        {{-- Se mantiene el campo para que el formulario siga funcionando --}}
+        <select
+            name="vehicle_id"
+            id="vehicle_id"
+            required
+            disabled
+            style="display:none;"
+        >
+            <option value="">
+                Seleccionar vehículo
+            </option>
+        </select>
 
-                    </div>
+    @else
+
+        <select
+            name="vehicle_id"
+            id="vehicle_id"
+            required
+        >
+
+            <option value="">
+                Seleccionar vehículo
+            </option>
+
+            @foreach($vehicles as $vehicle)
+
+                <option
+                    value="{{ $vehicle->id }}"
+                    data-brand="{{ $vehicle->brand }}"
+                    data-model="{{ $vehicle->model }}"
+                    data-year="{{ $vehicle->year }}"
+                    data-plates="{{ $vehicle->plates ?: 'Sin placas' }}"
+                    {{ old('vehicle_id') == $vehicle->id ? 'selected' : '' }}
+                >
+
+                    {{ $vehicle->brand }}
+                    {{ $vehicle->model }}
+                    {{ $vehicle->year }}
+
+                    @if($vehicle->plates)
+                        - {{ $vehicle->plates }}
+                    @endif
+
+                </option>
+
+            @endforeach
+
+        </select>
+
+    @endif
+
+</div>
 
 
                     <div class="field">

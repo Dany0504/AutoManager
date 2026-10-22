@@ -360,24 +360,55 @@
             </div>
 
             <nav class="menu">
-                <a href="#" class="active">Inicio</a>
-                <a href="{{ route('cliente.vehiculos') }}">Mis vehículos</a>
-                <a href="{{ route('cliente.citas.create') }}">Agendar cita</a>
-                <a href="#">Mis citas</a>
-                <a href="#">Rastrear orden</a>
-                <a href="#">Historial</a>
-                <a href="#">Autorizaciones</a>
-                <a href="{{ route('profile.edit') }}">Perfil</a>
-            </nav>
+
+    <a href="{{ route('cliente.dashboard') }}"
+       class="{{ request()->routeIs('cliente.dashboard') ? 'active' : '' }}">
+        Inicio
+    </a>
+
+    <a href="{{ route('cliente.vehiculos') }}"
+       class="{{ request()->routeIs('cliente.vehiculos*') ? 'active' : '' }}">
+        Mis vehículos
+    </a>
+
+    <a href="{{ route('cliente.citas.create') }}"
+       class="{{ request()->routeIs('cliente.citas.create') ? 'active' : '' }}">
+        Agendar cita
+    </a>
+
+    <a href="{{ route('cliente.citas.index') }}"
+       class="{{ request()->routeIs('cliente.citas.*') && !request()->routeIs('cliente.citas.create') ? 'active' : '' }}">
+        Mis citas
+    </a>
+
+    <a href="{{ route('cliente.rastrear-orden') }}"
+       class="{{ request()->routeIs('cliente.rastrear-orden') ? 'active' : '' }}">
+        Rastrear orden
+    </a>
+
+    <a href="{{ route('cliente.historial') }}"
+       class="{{ request()->routeIs('cliente.historial') ? 'active' : '' }}">
+        Historial
+    </a>
+
+    <a href="{{ route('cliente.autorizaciones') }}"
+       class="{{ request()->routeIs('cliente.autorizaciones*') ? 'active' : '' }}">
+        Autorizaciones
+    </a>
+
+    <a href="{{ route('profile.edit') }}"
+       class="{{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+        Perfil
+    </a>
+
+</nav>
 
         </div>
 
         <div class="sidebar-bottom">
             <p>Sesión activa</p>
             <h4>{{ auth()->user()->name }}</h4>
-
-            <a href="#">← Contraer</a>
-
+            
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit">◦ Cerrar sesión</button>

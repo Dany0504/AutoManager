@@ -8,7 +8,7 @@ use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\ClientVehicleController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ClientAppointmentController;
-
+use App\Http\Controllers\ClientAuthorizationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +46,15 @@ Route::middleware(['auth', 'role:administrador'])->group(function () {
         [VehicleController::class, 'storeAjax']
     )->name('vehiculos.ajax.store');
 
+    Route::patch(
+    '/admin/citas/{cita}/estado',
+    [AppointmentController::class, 'updateStatus']
+    )->name('citas.updateStatus');
+
+    Route::patch(
+    '/admin/citas/{cita}/mecanico',
+    [AppointmentController::class, 'updateMechanic']
+    )->name('citas.updateMechanic');
 });
 
 
@@ -60,6 +69,10 @@ Route::post(
     [AppointmentController::class, 'publicStore']
 );
 
+Route::post('/completar-cuenta-cita', [
+    AppointmentController::class,
+    'completePublicAccount'
+])->name('appointments.complete-account');
 
 /*
 |--------------------------------------------------------------------------
@@ -81,6 +94,34 @@ Route::post(
 )
     ->middleware(['auth', 'role:cliente'])
     ->name('cliente.citas.store');
+
+    Route::get('/cliente/autorizaciones', [
+    ClientAuthorizationController::class,
+    'index'
+])
+    ->middleware(['auth', 'role:cliente'])
+    ->name('cliente.autorizaciones');
+
+    Route::patch('/cliente/autorizaciones/{cita}/aprobar', [
+    ClientAuthorizationController::class,
+    'approve'
+])
+    ->middleware(['auth', 'role:cliente'])
+    ->name('cliente.autorizaciones.approve');
+
+Route::patch('/cliente/autorizaciones/{cita}/rechazar', [
+    ClientAuthorizationController::class,
+    'reject'
+])
+    ->middleware(['auth', 'role:cliente'])
+    ->name('cliente.autorizaciones.reject');
+
+    Route::get('/cliente/citas', [
+    ClientAppointmentController::class,
+    'index'
+])
+    ->middleware(['auth', 'role:cliente'])
+    ->name('cliente.citas.index');
 
 
 /*
@@ -237,6 +278,46 @@ Route::get('/cliente', function () {
     ->name('cliente.dashboard');
 
 
+// RASTREAR ÓRDENES DEL CLIENTE
+Route::get('/cliente/rastrear-orden', function () {
+
+    $client = auth()->user()->client;
+
+    $orders = $client
+        ? $client->appointments()
+            ->with('vehicle')
+            ->whereNotIn('status', ['completado', 'cancelado'])
+            ->orderByDesc('appointment_date')
+            ->get()
+        : collect();
+
+    return view('cliente.rastrear-orden', compact('orders'));
+
+})
+    ->middleware(['auth', 'role:cliente'])
+    ->name('cliente.rastrear-orden');
+
+
+// HISTORIAL DEL CLIENTE
+Route::get('/cliente/historial', function () {
+
+    $client = auth()->user()->client;
+
+    $history = $client
+        ? $client->appointments()
+            ->with('vehicle')
+            ->whereIn('status', ['completado', 'cancelado'])
+            ->orderByDesc('appointment_date')
+            ->get()
+        : collect();
+
+    return view('cliente.historial', compact('history'));
+
+})
+    ->middleware(['auth', 'role:cliente'])
+    ->name('cliente.historial');
+
+
 /*
 |--------------------------------------------------------------------------
 | CLIENTE - VEHÍCULOS
@@ -281,12 +362,27 @@ Route::put(
 |--------------------------------------------------------------------------
 */
 
-Route::get('/mecanico', function () {
+Route::get('/mecanico', [
+    \App\Http\Controllers\MecanicoController::class,
+    'index'
+])
+    ->middleware(['auth', 'role:mecanico'])
+    ->name('mecanico.dashboard');
 
-    return view('mecanico.dashboard');
+Route::get('/mecanico/citas/{cita}', [
+    \App\Http\Controllers\MecanicoController::class,
+    'show'
+])
+    ->middleware(['auth', 'role:mecanico'])
+    ->name('mecanico.citas.show');
 
-})
-    ->middleware(['auth', 'role:mecanico']);
+Route::patch('/mecanico/citas/{cita}/diagnostico', [
+    \App\Http\Controllers\MecanicoController::class,
+    'updateDiagnosis'
+])
+    ->middleware(['auth', 'role:mecanico'])
+    ->name('mecanico.citas.updateDiagnosis');
+
 
 
 /*
