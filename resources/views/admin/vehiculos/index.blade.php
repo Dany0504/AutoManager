@@ -586,7 +586,7 @@
                     Citas
                 </a>
 
-                <a href="#">
+                <a href="{{ route('usuarios.index') }}">
                     Usuarios
                 </a>
 
@@ -594,16 +594,16 @@
                     Vehículos
                 </a>
 
-                <a href="#">
-                    Mecánicos
+                <a href="{{ route('ordenes.index') }}">
+                    Órdenes
                 </a>
 
-                <a href="#">
-                    Inventario
-                </a>
-
-                <a href="#">
+                <a href="{{ route('reportes.index') }}">
                     Reportes
+                </a>
+
+                <a href="{{ route('parametros.index') }}">
+                    Parámetros
                 </a>
 
             </nav>

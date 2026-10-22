@@ -60,33 +60,21 @@ SVG'>
             Vehículos
         </x-nav-link>
 
-        {{-- Mecánicos --}}
+        {{-- Órdenes --}}
         <x-nav-link
-            href="#"
+            href="{{ route('ordenes.index') }}"
             :active="request()->is('admin/mecanicos*')"
             :icon='<<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.7 6.3a4 4 0 105.66 5.66l-4.24 4.24-5.66-5.66 4.24-4.24zM4 20l6-6"/>
 </svg>
 SVG'>
-            Mecánicos
-        </x-nav-link>
-
-        {{-- Inventario --}}
-        <x-nav-link
-            href="#"
-            :active="request()->is('admin/inventario*')"
-            :icon='<<<SVG
-<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0v10l-8 4m8-14l-8 4m0 10L4 17V7m8 4L4 7"/>
-</svg>
-SVG'>
-            Inventario
+            Órdenes
         </x-nav-link>
 
         {{-- Reportes --}}
         <x-nav-link
-            href="#"
+            href="{{ route('reportes.index') }}"
             :active="request()->is('admin/reportes*')"
             :icon='<<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

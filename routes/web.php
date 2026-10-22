@@ -7,8 +7,12 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\ClientVehicleController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\ClientAppointmentController;
 use App\Http\Controllers\ClientAuthorizationController;
+use App\Http\Controllers\AdminOrderController;
+use App\Http\Controllers\AdminReportController;
+use App\Http\Controllers\AdminParameterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,6 +59,53 @@ Route::middleware(['auth', 'role:administrador'])->group(function () {
     '/admin/citas/{cita}/mecanico',
     [AppointmentController::class, 'updateMechanic']
     )->name('citas.updateMechanic');
+
+    // GESTIÓN DE USUARIOS
+    Route::resource(
+        'admin/usuarios',
+        AdminUserController::class
+    )->names('usuarios');
+
+    Route::patch(
+        'admin/usuarios/{usuario}/reset-password',
+        [AdminUserController::class, 'resetPassword']
+    )->name('usuarios.resetPassword');
+
+    // ACTIVAR Y DESACTIVAR USUARIOS
+    Route::patch(
+        'admin/usuarios/{usuario}/estado',
+        [AdminUserController::class, 'cambiarEstado']
+    )->name('usuarios.cambiarEstado');
+
+    // GESTIÓN DE ÓRDENES
+    Route::get('/admin/ordenes', [AdminOrderController::class, 'index'])
+    ->name('ordenes.index');
+
+    Route::get('/admin/ordenes/{orden}', [AdminOrderController::class, 'show'])
+    ->name('ordenes.show');
+
+    // REPORTES DEL ADMINISTRADOR
+    Route::get('/admin/reportes', [AdminReportController::class, 'index'])
+        ->name('reportes.index');
+
+    Route::get('/admin/reportes/exportar', [AdminReportController::class, 'exportar'])
+        ->name('reportes.exportar');
+
+    // PARÁMETROS GENERALES
+
+    Route::get('/admin/parametros', [
+        AdminParameterController::class,
+        'index'
+    ])->name('parametros.index');
+
+    Route::put('/admin/parametros', [
+        AdminParameterController::class,
+        'update'
+    ])->name('parametros.update');
+
+    Route::put('/admin/parametros/citas', [
+    AdminParameterController::class, 'updateAppointments'
+    ])->name('parametros.citas.update');
 });
 
 

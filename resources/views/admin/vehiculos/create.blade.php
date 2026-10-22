@@ -484,15 +484,11 @@
                     Vehículos
                 </a>
 
-                <a href="#">
-                    Mecánicos
+                <a href="{{ route('ordenes.index') }}">
+                    Órdenes
                 </a>
 
-                <a href="#">
-                    Inventario
-                </a>
-
-                <a href="#">
+                <a href="{{ route('reportes.index') }}">
                     Reportes
                 </a>
 
