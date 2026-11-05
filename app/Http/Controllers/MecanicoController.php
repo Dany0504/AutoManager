@@ -17,7 +17,7 @@ class MecanicoController extends Controller
 
         $appointments = Appointment::with([
             'client',
-            'vehicle'
+            'vehicle',
         ])
             ->where('mechanic_id', $mechanicId)
             ->orderBy('appointment_date')
@@ -35,7 +35,7 @@ class MecanicoController extends Controller
                 'diagnostico',
                 'esperando_aprobacion',
                 'en_proceso',
-                'control_calidad'
+                'control_calidad',
             ])
             ->count();
 
@@ -55,31 +55,23 @@ class MecanicoController extends Controller
         );
     }
 
-
     /**
-     * Mostrar detalle de una orden.
+     * Mostrar cita del mecánico.
+     *
+     * Ya no cambiamos automáticamente
+     * el estado al abrir la cita.
      */
     public function show(Appointment $cita)
     {
-        abort_if(
-            $cita->mechanic_id !== Auth::id(),
+        abort_unless(
+            (int) $cita->mechanic_id === (int) Auth::id(),
             403
         );
 
         $cita->load([
             'client',
-            'vehicle'
+            'vehicle',
         ]);
-
-        /*
-         * Al abrir por primera vez una orden pendiente,
-         * pasa a diagnóstico.
-         */
-        if ($cita->status === 'pendiente') {
-            $cita->update([
-                'status' => 'diagnostico'
-            ]);
-        }
 
         return view(
             'mecanico.orden',
@@ -87,74 +79,35 @@ class MecanicoController extends Controller
         );
     }
 
-
     /**
-     * Guardar o enviar diagnóstico.
+     * Compatibilidad con el formulario anterior.
+     *
+     * La captura de diagnósticos y presupuestos
+     * ahora se realiza desde Detalle de orden.
      */
     public function updateDiagnosis(
         Request $request,
         Appointment $cita
     ) {
-        abort_if(
-            $cita->mechanic_id !== Auth::id(),
+        abort_unless(
+            (int) $cita->mechanic_id === (int) Auth::id(),
             403
         );
 
-        $validated = $request->validate([
-            'diagnosis' => [
-                'required',
-                'string',
-                'max:5000'
-            ],
-
-            'estimated_cost' => [
-                'required',
-                'numeric',
-                'min:0'
-            ],
-
-            'action' => [
-                'required',
-                'in:draft,submit'
-            ],
-        ]);
-
-        /*
-         * Guardar borrador.
-         */
-        if ($validated['action'] === 'draft') {
-
-            $cita->update([
-                'diagnosis' => $validated['diagnosis'],
-                'estimated_cost' => $validated['estimated_cost'],
-                'status' => 'diagnostico',
-                'authorization_status' => 'pendiente',
-            ]);
-
-            return redirect()
-                ->route('mecanico.citas.show', $cita)
-                ->with(
-                    'success',
-                    'Diagnóstico guardado como borrador.'
-                );
-        }
-
-        /*
-         * Enviar diagnóstico.
-         */
-        $cita->update([
-            'diagnosis' => $validated['diagnosis'],
-            'estimated_cost' => $validated['estimated_cost'],
-            'status' => 'esperando_aprobacion',
-            'authorization_status' => 'pendiente',
-            'diagnosis_submitted_at' => now(),
-        ]);
+        abort_unless(
+            $cita->intake_registered_at !== null,
+            403,
+            'Primero debes registrar el ingreso del vehículo.'
+        );
 
         return redirect()
-            ->route('mecanico.citas.show', $cita)
+            ->route(
+                'mecanico.ordenes.detalle',
+                ['cita' => $cita->id]
+            )
             ->with(
-                'success',
-                'Diagnóstico enviado correctamente.'
+                'error',
+                'Ahora debes guardar el diagnóstico y los conceptos desde Detalle de orden.'
             );
     }
 }

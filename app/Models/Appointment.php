@@ -44,4 +44,12 @@ protected $casts = [
     {
         return $this->belongsTo(User::class, 'mechanic_id');
     }
+
+    public function orderItems()
+    {
+        return $this->hasMany(
+            \App\Models\MechanicOrderItem::class,
+            'appointment_id'
+        );
+    }
 }

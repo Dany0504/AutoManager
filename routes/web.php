@@ -438,6 +438,80 @@ Route::patch('/mecanico/citas/{cita}/diagnostico', [
 
 /*
 |--------------------------------------------------------------------------
+| NUEVA ORDEN DE SERVICIO - MECÁNICO
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/mecanico/ordenes/nueva', [
+    \App\Http\Controllers\MechanicIntakeController::class,
+    'create'
+])
+    ->middleware(['auth', 'role:mecanico'])
+    ->name('mecanico.ordenes.create');
+
+Route::post('/mecanico/ordenes/ingreso', [
+    \App\Http\Controllers\MechanicIntakeController::class,
+    'store'
+])
+    ->middleware(['auth', 'role:mecanico'])
+    ->name('mecanico.ordenes.store');
+
+
+
+/*
+|--------------------------------------------------------------------------
+| DETALLE DE ORDEN - MECÁNICO
+|--------------------------------------------------------------------------
+*/
+
+ /*
+|--------------------------------------------------------------------------
+| Detalle de orden del mecánico
+|--------------------------------------------------------------------------
+*/
+
+// Pantalla con selector de citas que ya tienen ingreso registrado.
+Route::get(
+    '/mecanico/ordenes/detalle',
+    [\App\Http\Controllers\MechanicOrderDetailController::class, 'index']
+)
+    ->middleware(['auth', 'role:mecanico'])
+    ->name('mecanico.ordenes.detalle');
+
+// Abrir el detalle de una cita específica.
+Route::get(
+    '/mecanico/ordenes/{cita}/detalle',
+    [\App\Http\Controllers\MechanicOrderDetailController::class, 'show']
+)
+    ->middleware(['auth', 'role:mecanico'])
+    ->name('mecanico.ordenes.detalle.show');
+
+// Guardar diagnóstico, servicios y refacciones,
+// o solicitar autorización al cliente.
+Route::patch(
+    '/mecanico/ordenes/{cita}/detalle',
+    [\App\Http\Controllers\MechanicOrderDetailController::class, 'save']
+)
+    ->middleware(['auth', 'role:mecanico'])
+    ->name('mecanico.ordenes.detalle.save');
+
+//
+Route::get(
+    '/mecanico/ordenes/estatus',
+    [\App\Http\Controllers\MechanicStatusController::class, 'index']
+)
+    ->middleware(['auth', 'role:mecanico'])
+    ->name('mecanico.ordenes.estatus');
+
+Route::patch(
+    '/mecanico/ordenes/{cita}/estatus',
+    [\App\Http\Controllers\MechanicStatusController::class, 'update']
+)
+    ->middleware(['auth', 'role:mecanico'])
+    ->name('mecanico.ordenes.estatus.update');
+
+/*
+|--------------------------------------------------------------------------
 | ADMIN - DASHBOARD
 |--------------------------------------------------------------------------
 |

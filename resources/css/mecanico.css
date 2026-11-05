@@ -1,0 +1,482 @@
+/* ===== ESTILOS GENERALES ===== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f4f5;
+    color: #222;
+}
+
+/* ===== MENÚ LATERAL ===== */
+
+.mechanic-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100vh;
+    background: #050505;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.mechanic-sidebar-header {
+    min-height: 83px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #222;
+}
+
+.mechanic-sidebar-logo {
+    width: 27px;
+    height: 27px;
+    background: #e11d2e;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.mechanic-sidebar-brand {
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.mechanic-sidebar-role {
+    font-size: 12px;
+    color: #ccc;
+    margin-top: 4px;
+}
+
+.mechanic-sidebar-menu {
+    flex: 1;
+    padding-top: 8px;
+}
+
+.mechanic-sidebar-menu a {
+    display: flex;
+    align-items: center;
+    min-height: 45px;
+    padding: 12px 14px;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    border-left: 4px solid transparent;
+}
+
+.mechanic-sidebar-menu a:hover {
+    background: #191919;
+}
+
+.mechanic-sidebar-menu a.active {
+    background: #191919;
+    border-left-color: #e11d2e;
+}
+
+.mechanic-sidebar-footer {
+    border-top: 1px solid #222;
+    padding: 17px 18px 20px;
+}
+
+.mechanic-session-label {
+    font-size: 11px;
+    color: #aaa;
+    margin-bottom: 6px;
+}
+
+.mechanic-session-name {
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    margin-bottom: 12px;
+}
+
+.mechanic-sidebar-footer a,
+.mechanic-sidebar-footer button {
+    display: block;
+    width: 100%;
+    padding: 6px 0;
+    border: 0;
+    background: transparent;
+    color: #ddd;
+    text-align: left;
+    text-decoration: none;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.mechanic-sidebar-footer form {
+    margin: 0;
+}
+
+/* ===== CONTENIDO PRINCIPAL ===== */
+
+.mechanic-main {
+    margin-left: 220px;
+    width: calc(100% - 220px);
+    min-height: 100vh;
+}
+
+.mechanic-header {
+    padding: 24px 28px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+}
+
+.mechanic-header h1 {
+    margin: 0 0 6px;
+    font-size: 24px;
+}
+
+.mechanic-header p {
+    margin: 0;
+    color: #777;
+    font-size: 13px;
+}
+
+.mechanic-content {
+    padding: 26px 28px;
+    width: 100%;
+}
+
+/* ===== TARJETAS ===== */
+
+.mechanic-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 22px;
+    margin-bottom: 20px;
+}
+
+.mechanic-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+/* ===== FORMULARIOS ===== */
+
+.mechanic-form-group {
+    margin-bottom: 18px;
+}
+
+.mechanic-form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.mechanic-form-group input,
+.mechanic-form-group select,
+.mechanic-form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d5d5d5;
+    border-radius: 7px;
+    font: inherit;
+}
+
+/* ===== BOTONES ===== */
+
+.mechanic-btn {
+    display: inline-block;
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 7px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.mechanic-btn-red {
+    background: #d91f2b;
+    color: white;
+}
+
+.mechanic-btn-dark {
+    background: #222;
+    color: white;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 900px) {
+    .mechanic-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .mechanic-sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .mechanic-sidebar-menu {
+        flex: none;
+    }
+
+    .mechanic-main {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .mechanic-content {
+        padding: 18px;
+    }
+
+    .mechanic-stats {
+        grid-template-columns: 1fr;
+    }
+
+    /* ==========================================
+   DASHBOARD DEL MECÁNICO - MIS CITAS
+   ========================================== */
+
+/* Contenedor general */
+
+.mechanic-main {
+    margin-left: 220px;
+    width: calc(100% - 220px);
+    min-width: 0;
+    min-height: 100vh;
+}
+
+/* Encabezado */
+
+.mechanic-header {
+    background: #f5f5f5;
+    border-bottom: 1px solid #dddddd;
+    padding: 24px 28px 18px;
+}
+
+.mechanic-header h1 {
+    margin: 0 0 5px;
+    font-size: 24px;
+    color: #111111;
+}
+
+.mechanic-header p {
+    margin: 0;
+    color: #777777;
+    font-size: 14px;
+}
+
+/* Área de contenido */
+
+.mechanic-content {
+    width: 100%;
+    min-width: 0;
+    padding: 24px 28px;
+}
+
+/* Tarjetas de estadísticas */
+
+.mechanic-dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.mechanic-dashboard-stat-card {
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    padding: 20px;
+    min-width: 0;
+}
+
+.mechanic-dashboard-stat-card span {
+    display: block;
+    color: #777777;
+    font-size: 13px;
+}
+
+.mechanic-dashboard-stat-card strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 28px;
+    color: #111111;
+}
+
+/* Sección de vehículos */
+
+.mechanic-dashboard-section {
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.mechanic-dashboard-section-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid #dddddd;
+}
+
+.mechanic-dashboard-section-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #111111;
+}
+
+.mechanic-dashboard-section-header p {
+    margin: 5px 0 0;
+    color: #777777;
+    font-size: 13px;
+}
+
+/* Tabla */
+
+.mechanic-dashboard-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.mechanic-dashboard-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+.mechanic-dashboard-table thead {
+    background: #050505;
+    color: #ffffff;
+}
+
+.mechanic-dashboard-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.mechanic-dashboard-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eeeeee;
+    font-size: 14px;
+    color: #111111;
+}
+
+.mechanic-dashboard-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* Folio */
+
+.mechanic-dashboard-folio {
+    font-weight: bold;
+    color: #e11d2e;
+}
+
+/* Botón Abrir orden */
+
+.mechanic-dashboard-open-link {
+    display: inline-block;
+    color: #b01828;
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.mechanic-dashboard-open-link:hover {
+    color: #e11d2e;
+    text-decoration: underline;
+}
+
+/* Mensajes */
+
+.mechanic-success-message {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.mechanic-error-message {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Sin vehículos */
+
+.mechanic-dashboard-empty {
+    padding: 50px 20px;
+    text-align: center;
+    color: #777777;
+}
+
+.mechanic-dashboard-empty strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #333333;
+    font-size: 16px;
+}
+
+.mechanic-dashboard-empty p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+    .mechanic-dashboard-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .mechanic-main {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .mechanic-content {
+        padding: 18px;
+    }
+
+    .mechanic-header {
+        padding: 20px 18px;
+    }
+
+    .mechanic-dashboard-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    }
+
+    @media (max-width: 500px) {
+        .mechanic-dashboard-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .mechanic-content {
+            padding: 14px;
+        }
+    }
+}
