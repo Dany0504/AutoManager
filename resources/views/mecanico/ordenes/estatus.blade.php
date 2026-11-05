@@ -133,6 +133,11 @@
                         'title' => 'Listo para entrega',
                         'description' => 'Vehículo disponible',
                     ],
+                    [
+                        'status' => 'entregado',
+                        'title' => 'Entregado',
+                        'description' => 'Vehículo entregado al cliente',
+                    ],
                 ];
 
                 $statusOrder = array_column($steps, 'status');
@@ -304,7 +309,17 @@
                                 Avanzar a {{ $next['label'] }} →
                             </button>
                         @endif
-
+                        @if($cita->status === 'listo')
+                            <button
+                                type="submit"
+                                name="action"
+                                value="deliver"
+                                class="mechanic-btn mechanic-btn-red"
+                                onclick="return confirm('¿Confirmas que el vehículo ya fue entregado al cliente?')"
+                            >
+                                Confirmar entrega ✓
+                            </button>
+                        @endif
                         <button
                             type="submit"
                             name="action"

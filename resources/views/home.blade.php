@@ -569,23 +569,26 @@
                 <h3>Datos del vehículo</h3>
 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <input
+                    type="text"
+                    name="brand"
+                    placeholder="Marca (Ej. Mazda)"
+                    required
+                >
 
-                    <select id="yearPublic" name="year" required>
-                        <option value="">Año</option>
-                    </select>
+                <input
+                    type="text"
+                    name="model"
+                    placeholder="Modelo (Ej. Mazda 6)"
+                    required
+                >
 
-                    <select id="brandPublic" name="brand" disabled required>
-                        <option>Marca</option>
-                    </select>
-
-                    <select id="modelPublic" name="model" disabled required>
-                        <option>Modelo</option>
-                    </select>
-
-                    <select id="enginePublic" name="engine" disabled required>
-                        <option>Motor</option>
-                    </select>
-
+                <input
+                    type="text"
+                    name="engine"
+                    placeholder="Motor (Ej. 2.5L)"
+                    required
+                >
                 </div>
 
                 <input name="color" placeholder="Color" required>
@@ -709,106 +712,7 @@ window.onclick=function(e){
 
 }
 
-// ================= CATÁLOGO PÚBLICO =================
 
-const yearPublic = document.getElementById('yearPublic');
-const brandPublic = document.getElementById('brandPublic');
-const modelPublic = document.getElementById('modelPublic');
-const enginePublic = document.getElementById('enginePublic');
-
-// Llenar años
-for(let y = new Date().getFullYear(); y >= 1995; y--){
-    yearPublic.innerHTML += `<option value="${y}">${y}</option>`;
-}
-
-// AÑO → MARCAS
-yearPublic.addEventListener('change', async function(){
-
-    brandPublic.disabled = true;
-    modelPublic.disabled = true;
-    enginePublic.disabled = true;
-
-    brandPublic.innerHTML = '<option value="">Cargando...</option>';
-    modelPublic.innerHTML = '<option value="">Modelo</option>';
-    enginePublic.innerHTML = '<option value="">Motor</option>';
-
-    if(!this.value) return;
-
-    try{
-
-        const res = await fetch(`/catalog/marcas/${this.value}`);
-        const brands = await res.json();
-
-        brandPublic.innerHTML = '<option value="">Selecciona una marca</option>';
-
-        brands.forEach(brand=>{
-            brandPublic.innerHTML += `<option value="${brand}">${brand}</option>`;
-        });
-
-        brandPublic.disabled = false;
-
-    }catch(err){
-        console.error(err);
-    }
-
-});
-
-// MARCA → MODELOS
-brandPublic.addEventListener('change', async function(){
-
-    modelPublic.disabled = true;
-    enginePublic.disabled = true;
-
-    modelPublic.innerHTML = '<option value="">Cargando...</option>';
-    enginePublic.innerHTML = '<option value="">Motor</option>';
-
-    if(!this.value) return;
-
-    try{
-
-        const res = await fetch(`/catalog/modelos/${yearPublic.value}/${encodeURIComponent(this.value)}`);
-        const models = await res.json();
-
-        modelPublic.innerHTML = '<option value="">Selecciona un modelo</option>';
-
-        models.forEach(model=>{
-            modelPublic.innerHTML += `<option value="${model}">${model}</option>`;
-        });
-
-        modelPublic.disabled = false;
-
-    }catch(err){
-        console.error(err);
-    }
-
-});
-
-// MODELO → MOTORES
-modelPublic.addEventListener('change', async function(){
-
-    enginePublic.disabled = true;
-    enginePublic.innerHTML = '<option value="">Cargando...</option>';
-
-    if(!this.value) return;
-
-    try{
-
-        const res = await fetch(`/catalog/motores/${yearPublic.value}/${encodeURIComponent(brandPublic.value)}/${encodeURIComponent(this.value)}`);
-        const engines = await res.json();
-
-        enginePublic.innerHTML = '<option value="">Selecciona un motor</option>';
-
-        engines.forEach(engine=>{
-            enginePublic.innerHTML += `<option value="${engine}">${engine}</option>`;
-        });
-
-        enginePublic.disabled = false;
-
-    }catch(err){
-        console.error(err);
-    }
-
-});
 // ================= ENVIAR CITA PÚBLICA =================
 
 document.getElementById('publicAppointmentForm').addEventListener('submit', async function(e){
@@ -961,29 +865,34 @@ document.getElementById('trackingForm').addEventListener('submit', async functio
 
         const steps = [
             {
-                key:'pendiente',
-                title:'Recepción',
-                description:'Vehículo recibido en taller'
+                key: 'pendiente',
+                title: 'Recepción',
+                description: 'Vehículo recibido en taller'
             },
             {
-                key:'diagnostico',
-                title:'Diagnóstico',
-                description:'Revisión inicial del vehículo'
+                key: 'diagnostico',
+                title: 'Diagnóstico',
+                description: 'Revisión inicial del vehículo'
             },
             {
-                key:'en_proceso',
-                title:'En proceso',
-                description:'Servicio y reparación en proceso'
+                key: 'en_proceso',
+                title: 'En proceso',
+                description: 'Servicio y reparación en proceso'
             },
             {
-                key:'control_calidad',
-                title:'Control de calidad',
-                description:'Pruebas y revisión final'
+                key: 'control_calidad',
+                title: 'Control de calidad',
+                description: 'Pruebas y revisión final'
             },
             {
-                key:'listo',
-                title:'Listo para entrega',
-                description:'Vehículo disponible para recoger'
+                key: 'listo',
+                title: 'Listo para entrega',
+                description: 'Vehículo disponible para recoger'
+            },
+            {
+                key: 'entregado',
+                title: 'Entregado',
+                description: 'Vehículo entregado al cliente'
             }
         ];
 

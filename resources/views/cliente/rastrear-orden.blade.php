@@ -416,9 +416,9 @@
                         'Diagnóstico',
                         'En proceso',
                         'Control de calidad',
-                        'Entrega',
+                        'Listo para entrega',
+                        'Entregado',
                     ];
-
                     $status = strtolower(trim($order->status ?? 'pendiente'));
 
                     $statusSteps = [
@@ -428,6 +428,7 @@
                         'control_calidad' => 3,
                         'listo' => 4,
                         'completado' => 4,
+                        'entregado' => 5,
                     ];
 
                     $currentStep = $statusSteps[$status] ?? 0;
@@ -439,6 +440,7 @@
                         'control_calidad' => 'Control de calidad',
                         'listo' => 'Listo para entrega',
                         'completado' => 'Completado',
+                        'entregado' => 'Entregado',
                     ];
 
                     $statusLabel = $statusLabels[$status]

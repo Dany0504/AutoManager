@@ -58,7 +58,7 @@ class MechanicStatusController extends Controller
     public function update(Request $request, Appointment $cita)
     {
         $validated = $request->validate([
-            'action' => ['required', 'in:note,advance'],
+            'action' => ['required', 'in:note,advance,deliver'],
             'note' => ['nullable', 'string', 'max:3000'],
         ]);
 
@@ -90,8 +90,21 @@ class MechanicStatusController extends Controller
 
             $previousStatus = $appointment->status;
             $newStatus = $previousStatus;
+            if ($validated['action'] === 'deliver') {
 
-            if ($validated['action'] === 'advance') {
+                if ($previousStatus !== 'listo') {
+                    throw ValidationException::withMessages([
+                        'action' => 'El vehículo debe estar listo para entrega antes de marcarlo como entregado.',
+                    ]);
+                }
+
+                $newStatus = 'entregado';
+
+                $appointment->update([
+                    'status' => $newStatus,
+                ]);
+
+            } elseif ($validated['action'] === 'advance') {
                 $nextStatuses = [
                     'esperando_aprobacion' => 'en_proceso',
                     'en_proceso' => 'control_calidad',

@@ -588,67 +588,49 @@
 
                 {{-- MARCA --}}
 
-                <div class="field">
+            <div class="field">
+                <label>Marca</label>
 
-                    <label>Marca</label>
-
-                    <select
-                        id="brandSelect"
-                        name="brand"
-                        required
-                        disabled
-                    >
-
-                        <option value="">
-                            Primero selecciona el año
-                        </option>
-
-                    </select>
-
-                </div>
+                <input
+                    type="text"
+                    id="brandSelect"
+                    name="brand"
+                    value="{{ old('brand', $vehicle->brand ?? '') }}"
+                    placeholder="Ej. Honda, Toyota, Nissan"
+                    required
+                >
+            </div>
 
 
                 {{-- MODELO --}}
 
                 <div class="field">
-
                     <label>Modelo</label>
 
-                    <select
+                    <input
+                        type="text"
                         id="modelSelect"
                         name="model"
+                        value="{{ old('model', $vehicle->model ?? '') }}"
+                        placeholder="Ej. Civic, Corolla, Versa"
                         required
-                        disabled
                     >
-
-                        <option value="">
-                            Primero selecciona la marca
-                        </option>
-
-                    </select>
-
                 </div>
 
 
                 {{-- MOTOR --}}
 
                 <div class="field">
-
                     <label>Motor</label>
 
-                    <select
+                    <input
+                        type="text"
                         id="engineSelect"
                         name="engine"
+                        value="{{ old('engine', $vehicle->engine ?? '') }}"
+                        placeholder="Ej. 2.0, 1.8, 2.5"
                         required
-                        disabled
                     >
-
-                        <option value="">
-                            Primero selecciona el modelo
-                        </option>
-
-                    </select>
-
                 </div>
 
 
