@@ -539,7 +539,7 @@
         <header class="topbar">
 
             <h1>
-                Autorizaciones
+                Autorizaciones.
             </h1>
 
             <p>
