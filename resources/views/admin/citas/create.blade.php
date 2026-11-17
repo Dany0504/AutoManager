@@ -330,7 +330,7 @@
         }
 
         .field textarea {
-            resize: vertical;
+            resize: none;
 
             min-height: 120px;
         }
@@ -2223,6 +2223,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </script>
 
+
+@include('partials.campos-obligatorios')
 </body>
 
 </html>

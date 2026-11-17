@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\MechanicStatusLog;
 use Illuminate\Support\Facades\Auth;
 
 class ClientAuthorizationController extends Controller
@@ -61,8 +62,18 @@ class ClientAuthorizationController extends Controller
             'authorized_at' => now(),
         ]);
 
+        // Queda en el historial que ve el mecánico.
+        MechanicStatusLog::create([
+            'appointment_id' => $cita->id,
+            'mechanic_id' => Auth::id(),
+            'previous_status' => 'esperando_aprobacion',
+            'new_status' => 'en_proceso',
+            'note' => 'El cliente autorizó el presupuesto.',
+        ]);
+
+        // Regresa a la pantalla donde se tomó la decisión (inicio o Autorizaciones).
         return redirect()
-            ->route('cliente.autorizaciones')
+            ->back(fallback: route('cliente.autorizaciones'))
             ->with(
                 'success',
                 'Reparación autorizada correctamente.'
@@ -94,8 +105,18 @@ class ClientAuthorizationController extends Controller
             'authorized_at' => null,
         ]);
 
+        // Queda en el historial que ve el mecánico.
+        MechanicStatusLog::create([
+            'appointment_id' => $cita->id,
+            'mechanic_id' => Auth::id(),
+            'previous_status' => 'esperando_aprobacion',
+            'new_status' => 'diagnostico',
+            'note' => 'El cliente rechazó el presupuesto. Revisa el diagnóstico y vuelve a enviarlo.',
+        ]);
+
+        // Regresa a la pantalla donde se tomó la decisión (inicio o Autorizaciones).
         return redirect()
-            ->route('cliente.autorizaciones')
+            ->back(fallback: route('cliente.autorizaciones'))
             ->with(
                 'success',
                 'La reparación fue rechazada. El mecánico deberá revisar el diagnóstico.'

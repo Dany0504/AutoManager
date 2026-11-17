@@ -21,6 +21,8 @@
 
     @stack('scripts')
 
+
+@include('partials.campos-obligatorios')
 </body>
 
 </html>

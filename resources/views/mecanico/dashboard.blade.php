@@ -1,14 +1,14 @@
 ﻿@extends('mecanico.layouts.app')
 
-@section('title', 'Mis citas | AutoManager')
+@section('title', 'Mis órdenes | AutoManager')
 
 @section('content')
 
     <header class="mechanic-header">
-        <h1>Panel del mecánico</h1>
+        <h1>Mis órdenes</h1>
 
         <p>
-            Consulta y administra los vehículos asignados a tu taller.
+            Abre una orden para continuar su trabajo: ingreso, diagnóstico, reparación y entrega.
         </p>
     </header>
 
@@ -64,6 +64,22 @@
                     Aquí aparecerán las citas que el administrador
                     te haya asignado.
                 </p>
+
+                <nav class="mechanic-dashboard-filters" aria-label="Filtrar citas">
+                    @foreach([
+                        'activas' => 'Activas',
+                        'hoy' => 'Hoy',
+                        'todas' => 'Todas',
+                    ] as $clave => $texto)
+                        <a
+                            href="{{ route('mecanico.dashboard', ['filtro' => $clave]) }}"
+                            class="{{ $filtro === $clave ? 'active' : '' }}"
+                        >
+                            {{ $texto }}
+                            <span>{{ $conteoFiltros[$clave] }}</span>
+                        </a>
+                    @endforeach
+                </nav>
 
             </div>
 
@@ -131,89 +147,20 @@
                                     </td>
 
                                     <td>
-                                        @switch($appointment->status)
-
-                                            @case('pendiente')
-                                                Pendiente
-                                                @break
-
-                                            @case('diagnostico')
-                                                Diagnóstico
-                                                @break
-
-                                            @case('esperando_aprobacion')
-                                                Esperando autorización
-                                                @break
-
-                                            @case('en_proceso')
-                                                En proceso
-                                                @break
-
-                                            @case('control_calidad')
-                                                Control de calidad
-                                                @break
-
-                                            @case('listo')
-                                                Listo para entrega
-                                                @break
-
-                                            @case('rechazado')
-                                                Rechazado
-                                                @break
-
-                                            @case('completado')
-                                                Completado
-                                                @break
-
-                                            @default
-                                                {{ ucfirst(str_replace('_', ' ', $appointment->status)) }}
-
-                                        @endswitch
+                                        {{ $appointment->status_label }}
                                     </td>
 
                                     <td>
                                         @php
-                                            $ingresoRegistrado = !is_null($appointment->intake_registered_at);
-
-                                            $estatusAvanzado = in_array($appointment->status, [
-                                                'esperando_aprobacion',
-                                                'en_proceso',
-                                                'control_calidad',
-                                                'listo',
-                                            ], true);
+                                            $accion = \App\Http\Controllers\MechanicOrderController::nextActionLabel($appointment);
                                         @endphp
 
-                                        @if(!$ingresoRegistrado)
-
-                                            {{-- Todavía no se registra el ingreso --}}
-                                            <a
-                                                href="{{ route('mecanico.ordenes.create', ['cita' => $appointment->id]) }}"
-                                                class="mechanic-action-link"
-                                            >
-                                                Registrar ingreso
-                                            </a>
-
-                                        @elseif($estatusAvanzado)
-
-                                            {{-- La orden ya está en una etapa posterior --}}
-                                            <a
-                                                href="{{ route('mecanico.ordenes.estatus', ['cita' => $appointment->id]) }}"
-                                                class="mechanic-action-link"
-                                            >
-                                                Ver estatus
-                                            </a>
-
-                                        @else
-
-                                            {{-- Ingreso registrado, pendiente de diagnóstico --}}
-                                            <a
-                                                href="{{ route('mecanico.ordenes.detalle', ['cita' => $appointment->id]) }}"
-                                                class="mechanic-action-link"
-                                            >
-                                                Ver detalle
-                                            </a>
-
-                                        @endif
+                                        <a
+                                            href="{{ route('mecanico.ordenes.ficha', $appointment) }}"
+                                            class="mechanic-action-link {{ $accion === 'Esperando cliente' || $accion === 'Ver orden' ? 'secondary' : '' }}"
+                                        >
+                                            {{ $accion }}
+                                        </a>
                                     </td>
 
                                 </tr>
@@ -229,7 +176,13 @@
                     <div class="mechanic-dashboard-empty">
 
                         <strong>
-                            No tienes vehículos asignados
+                            @if($filtro === 'hoy')
+                                No tienes citas activas para hoy
+                            @elseif($filtro === 'activas' && $conteoFiltros['todas'] > 0)
+                                No tienes órdenes activas
+                            @else
+                                No tienes vehículos asignados
+                            @endif
                         </strong>
 
                         <p>

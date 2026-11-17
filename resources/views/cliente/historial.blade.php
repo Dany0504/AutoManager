@@ -308,48 +308,8 @@
             </div>
 
             <nav class="menu">
-
-    <a href="{{ route('cliente.dashboard') }}"
-       class="{{ request()->routeIs('cliente.dashboard') ? 'active' : '' }}">
-        Inicio
-    </a>
-
-    <a href="{{ route('cliente.vehiculos') }}"
-       class="{{ request()->routeIs('cliente.vehiculos*') ? 'active' : '' }}">
-        Mis vehículos
-    </a>
-
-    <a href="{{ route('cliente.citas.create') }}"
-       class="{{ request()->routeIs('cliente.citas.create') ? 'active' : '' }}">
-        Agendar cita
-    </a>
-
-    <a href="{{ route('cliente.citas.index') }}"
-       class="{{ request()->routeIs('cliente.citas.*') && !request()->routeIs('cliente.citas.create') ? 'active' : '' }}">
-        Mis citas
-    </a>
-
-    <a href="{{ route('cliente.rastrear-orden') }}"
-       class="{{ request()->routeIs('cliente.rastrear-orden') ? 'active' : '' }}">
-        Rastrear orden
-    </a>
-
-    <a href="{{ route('cliente.historial') }}"
-       class="{{ request()->routeIs('cliente.historial') ? 'active' : '' }}">
-        Historial
-    </a>
-
-    <a href="{{ route('cliente.autorizaciones') }}"
-       class="{{ request()->routeIs('cliente.autorizaciones*') ? 'active' : '' }}">
-        Autorizaciones
-    </a>
-
-    <a href="{{ route('profile.edit') }}"
-       class="{{ request()->routeIs('profile.edit') ? 'active' : '' }}">
-        Perfil
-    </a>
-
-</nav>
+            @include('cliente.partials.menu')
+        </nav>
         </div>
 
         <div class="sidebar-bottom">
@@ -366,7 +326,7 @@
     <main class="main">
         <header class="topbar">
             <h1>Historial de servicios</h1>
-            <p>Consulta las citas finalizadas y canceladas de tus vehículos.</p>
+            <p>Consulta los servicios entregados y las citas canceladas de tus vehículos.</p>
         </header>
 
         <div class="content">
@@ -390,7 +350,7 @@
                         </span>
 
                         <span class="status {{ $cancelled ? 'cancelled' : 'completed' }}">
-                            {{ $cancelled ? 'Cancelado' : 'Completado' }}
+                            {{ $item->status_label }}
                         </span>
                     </div>
 
@@ -416,8 +376,22 @@
 
                         <p>
                             <strong>Hora:</strong>
-                            {{ $item->appointment_time }}
+                            {{ substr((string) $item->appointment_time, 0, 5) }}
                         </p>
+
+                        @if(!$cancelled && $item->estimated_cost)
+                            <p>
+                                <strong>Total:</strong>
+                                ${{ number_format((float) $item->estimated_cost, 2) }}
+                            </p>
+                        @endif
+
+                        @if($item->diagnosis)
+                            <div class="observations">
+                                <strong>Diagnóstico:</strong>
+                                {{ $item->diagnosis }}
+                            </div>
+                        @endif
 
                         @if($item->notes)
                             <div class="observations">
@@ -435,7 +409,7 @@
                     <div class="icon">🔧</div>
                     <h3>Tu historial está vacío</h3>
                     <p>
-                        Cuando tengas citas completadas o canceladas,
+                        Cuando se te entregue un vehículo o se cancele una cita,
                         aparecerán aquí junto con la información del servicio.
                     </p>
 

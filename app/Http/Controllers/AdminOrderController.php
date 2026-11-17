@@ -27,7 +27,12 @@ class AdminOrderController extends Controller
         $ordenes = Appointment::query()
             ->with(['client', 'vehicle', 'mechanic'])
             ->when(
-                $estado !== 'todos',
+                $estado === 'completado',
+                // Las órdenes que el mecánico cierra quedan como "entregado".
+                fn ($query) => $query->whereIn('status', ['completado', 'entregado'])
+            )
+            ->when(
+                !in_array($estado, ['todos', 'completado'], true),
                 fn ($query) => $query->where('status', $estado)
             )
             ->orderByDesc('appointment_date')

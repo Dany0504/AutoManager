@@ -25,6 +25,7 @@
             name="folio"
             value="{{ old('folio') }}"
             placeholder="Ej. AM-2026-000001"
+            required
         >
 
         <button type="submit">
@@ -93,5 +94,7 @@
 
     @endisset
 
+
+@include('partials.campos-obligatorios')
 </body>
 </html>

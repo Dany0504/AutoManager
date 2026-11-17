@@ -160,7 +160,7 @@
 
         .field textarea {
             min-height: 70px;
-            resize: vertical;
+            resize: none;
         }
 
         .two-columns {
@@ -818,5 +818,7 @@
     renderBlockedDates();
 </script>
 
+
+@include('partials.campos-obligatorios')
 </body>
 </html>

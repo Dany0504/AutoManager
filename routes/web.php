@@ -287,6 +287,7 @@ Route::get('/cliente', function () {
      */
     $appointments = $client
         ? $client->appointments()
+            ->with('vehicle')
             ->orderBy('appointment_date')
             ->get()
         : collect();
@@ -296,6 +297,7 @@ Route::get('/cliente', function () {
      * Próxima cita.
      */
     $nextAppointment = $appointments
+        ->whereNotIn('status', \App\Models\Appointment::FINISHED_STATUSES)
         ->where(
             'appointment_date',
             '>=',
@@ -310,9 +312,23 @@ Route::get('/cliente', function () {
     $activeOrder = $appointments
         ->whereNotIn(
             'status',
-            ['completado', 'cancelado']
+            \App\Models\Appointment::FINISHED_STATUSES
         )
         ->first();
+
+
+    /*
+     * Presupuestos que esperan la autorización del cliente
+     * (se muestran al inicio, sin tener que entrar al menú).
+     */
+    $pendingAuthorizationsList = $client
+        ? $client->appointments()
+            ->with(['vehicle', 'orderItems'])
+            ->where('status', 'esperando_aprobacion')
+            ->where('authorization_status', 'pendiente')
+            ->orderByDesc('diagnosis_submitted_at')
+            ->get()
+        : collect();
 
 
     return view(
@@ -320,7 +336,8 @@ Route::get('/cliente', function () {
         compact(
             'vehicles',
             'nextAppointment',
-            'activeOrder'
+            'activeOrder',
+            'pendingAuthorizationsList'
         )
     );
 
@@ -337,7 +354,7 @@ Route::get('/cliente/rastrear-orden', function () {
     $orders = $client
         ? $client->appointments()
             ->with('vehicle')
-            ->whereNotIn('status', ['completado', 'cancelado'])
+            ->whereNotIn('status', \App\Models\Appointment::FINISHED_STATUSES)
             ->orderByDesc('appointment_date')
             ->get()
         : collect();
@@ -357,7 +374,7 @@ Route::get('/cliente/historial', function () {
     $history = $client
         ? $client->appointments()
             ->with('vehicle')
-            ->whereIn('status', ['completado', 'cancelado'])
+            ->whereIn('status', \App\Models\Appointment::FINISHED_STATUSES)
             ->orderByDesc('appointment_date')
             ->get()
         : collect();
@@ -411,104 +428,51 @@ Route::put(
 |--------------------------------------------------------------------------
 | MECÁNICO
 |--------------------------------------------------------------------------
+|
+| Todo el trabajo de una orden ocurre en su ficha (mecanico.ordenes.ficha).
+| Las pantallas antiguas (ordenes/nueva, ordenes/detalle, ordenes/estatus)
+| solo redirigen a la ficha o a Mis órdenes; sus POST/PATCH siguen activos.
 */
 
-Route::get('/mecanico', [
-    \App\Http\Controllers\MecanicoController::class,
-    'index'
-])
-    ->middleware(['auth', 'role:mecanico'])
-    ->name('mecanico.dashboard');
+Route::middleware(['auth', 'role:mecanico'])->group(function () {
 
-Route::get('/mecanico/citas/{cita}', [
-    \App\Http\Controllers\MecanicoController::class,
-    'show'
-])
-    ->middleware(['auth', 'role:mecanico'])
-    ->name('mecanico.citas.show');
+    // Mis citas (con filtros ?filtro=activas|hoy|todas)
+    Route::get('/mecanico', [\App\Http\Controllers\MecanicoController::class, 'index'])
+        ->name('mecanico.dashboard');
 
-Route::patch('/mecanico/citas/{cita}/diagnostico', [
-    \App\Http\Controllers\MecanicoController::class,
-    'updateDiagnosis'
-])
-    ->middleware(['auth', 'role:mecanico'])
-    ->name('mecanico.citas.updateDiagnosis');
+    // Ficha única de la orden (Ingreso -> Diagnóstico y presupuesto -> Reparación -> Entrega)
+    Route::get('/mecanico/ordenes/{cita}', [\App\Http\Controllers\MechanicOrderController::class, 'show'])
+        ->whereNumber('cita')
+        ->name('mecanico.ordenes.ficha');
 
+    // Enlaces anteriores: redirigen a la ficha
+    Route::get('/mecanico/citas/{cita}', [\App\Http\Controllers\MecanicoController::class, 'show'])
+        ->name('mecanico.citas.show');
 
+    // Ingreso del vehículo
+    Route::get('/mecanico/ordenes/nueva', [\App\Http\Controllers\MechanicIntakeController::class, 'create'])
+        ->name('mecanico.ordenes.create');
 
-/*
-|--------------------------------------------------------------------------
-| NUEVA ORDEN DE SERVICIO - MECÁNICO
-|--------------------------------------------------------------------------
-*/
+    Route::post('/mecanico/ordenes/ingreso', [\App\Http\Controllers\MechanicIntakeController::class, 'store'])
+        ->name('mecanico.ordenes.store');
 
-Route::get('/mecanico/ordenes/nueva', [
-    \App\Http\Controllers\MechanicIntakeController::class,
-    'create'
-])
-    ->middleware(['auth', 'role:mecanico'])
-    ->name('mecanico.ordenes.create');
+    // Detalle: diagnóstico, servicios, refacciones y solicitud de autorización
+    Route::get('/mecanico/ordenes/detalle', [\App\Http\Controllers\MechanicOrderDetailController::class, 'index'])
+        ->name('mecanico.ordenes.detalle');
 
-Route::post('/mecanico/ordenes/ingreso', [
-    \App\Http\Controllers\MechanicIntakeController::class,
-    'store'
-])
-    ->middleware(['auth', 'role:mecanico'])
-    ->name('mecanico.ordenes.store');
+    Route::get('/mecanico/ordenes/{cita}/detalle', [\App\Http\Controllers\MechanicOrderDetailController::class, 'show'])
+        ->name('mecanico.ordenes.detalle.show');
 
+    Route::patch('/mecanico/ordenes/{cita}/detalle', [\App\Http\Controllers\MechanicOrderDetailController::class, 'save'])
+        ->name('mecanico.ordenes.detalle.save');
 
+    // Cambio de estatus, notas y entrega
+    Route::get('/mecanico/ordenes/estatus', [\App\Http\Controllers\MechanicStatusController::class, 'index'])
+        ->name('mecanico.ordenes.estatus');
 
-/*
-|--------------------------------------------------------------------------
-| DETALLE DE ORDEN - MECÁNICO
-|--------------------------------------------------------------------------
-*/
-
- /*
-|--------------------------------------------------------------------------
-| Detalle de orden del mecánico
-|--------------------------------------------------------------------------
-*/
-
-// Pantalla con selector de citas que ya tienen ingreso registrado.
-Route::get(
-    '/mecanico/ordenes/detalle',
-    [\App\Http\Controllers\MechanicOrderDetailController::class, 'index']
-)
-    ->middleware(['auth', 'role:mecanico'])
-    ->name('mecanico.ordenes.detalle');
-
-// Abrir el detalle de una cita específica.
-Route::get(
-    '/mecanico/ordenes/{cita}/detalle',
-    [\App\Http\Controllers\MechanicOrderDetailController::class, 'show']
-)
-    ->middleware(['auth', 'role:mecanico'])
-    ->name('mecanico.ordenes.detalle.show');
-
-// Guardar diagnóstico, servicios y refacciones,
-// o solicitar autorización al cliente.
-Route::patch(
-    '/mecanico/ordenes/{cita}/detalle',
-    [\App\Http\Controllers\MechanicOrderDetailController::class, 'save']
-)
-    ->middleware(['auth', 'role:mecanico'])
-    ->name('mecanico.ordenes.detalle.save');
-
-//
-Route::get(
-    '/mecanico/ordenes/estatus',
-    [\App\Http\Controllers\MechanicStatusController::class, 'index']
-)
-    ->middleware(['auth', 'role:mecanico'])
-    ->name('mecanico.ordenes.estatus');
-
-Route::patch(
-    '/mecanico/ordenes/{cita}/estatus',
-    [\App\Http\Controllers\MechanicStatusController::class, 'update']
-)
-    ->middleware(['auth', 'role:mecanico'])
-    ->name('mecanico.ordenes.estatus.update');
+    Route::patch('/mecanico/ordenes/{cita}/estatus', [\App\Http\Controllers\MechanicStatusController::class, 'update'])
+        ->name('mecanico.ordenes.estatus.update');
+});
 
 /*
 |--------------------------------------------------------------------------

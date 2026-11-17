@@ -325,7 +325,7 @@
 
                 <a href="{{ route('ordenes.index', ['estado' => 'completado']) }}"
                    class="filter {{ $estado === 'completado' ? 'active' : '' }}">
-                    Completado
+                    Entregado
                 </a>
             </div>
 
@@ -378,13 +378,13 @@
                                             'en_proceso' => 'proceso',
                                             'diagnostico' => 'diagnostico',
                                             'listo' => 'listo',
-                                            'completado' => 'completado',
+                                            'completado', 'entregado' => 'completado',
                                             default => 'pendiente',
                                         };
                                     @endphp
 
                                     <span class="badge {{ $claseEstado }}">
-                                        {{ ucfirst(str_replace('_', ' ', $orden->status)) }}
+                                        {{ $orden->status_label }}
                                     </span>
                                 </td>
 

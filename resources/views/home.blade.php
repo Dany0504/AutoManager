@@ -185,6 +185,17 @@
             border: 1px solid #ccc;
         }
 
+        .mini-label {
+            display: block;
+            color: #555;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .mini-label input {
+            margin-top: 6px;
+        }
+
         .cuerpo button {
             width: 100%;
             padding: 14px;
@@ -339,6 +350,8 @@
     border-radius:8px;
     border:1px solid #ccc;
     font-size:15px;
+    font-family:inherit;
+    resize:none;
 }
 
 .cuerpo h3{
@@ -603,9 +616,13 @@
 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
 
-                    <input type="date" name="appointment_date" required>
+                    <label class="mini-label">Fecha
+                        <input type="date" name="appointment_date" required>
+                    </label>
 
-                    <input type="time" name="appointment_time" required>
+                    <label class="mini-label">Hora
+                        <input type="time" name="appointment_time" required>
+                    </label>
 
                 </div>
 
@@ -1098,6 +1115,8 @@ document.getElementById('trackingForm').addEventListener('submit', async functio
     </div>
 </div>
 
+
+@include('partials.campos-obligatorios')
 </body>
 
 </html>

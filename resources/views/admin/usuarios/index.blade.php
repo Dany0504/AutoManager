@@ -871,5 +871,7 @@
         });
     </script>
 @endif
+
+@include('partials.campos-obligatorios')
 </body>
 </html>

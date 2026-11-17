@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\MechanicStatusLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -10,34 +11,17 @@ use Illuminate\Validation\Rule;
 
 class MechanicIntakeController extends Controller
 {
+    /**
+     * Pantalla anterior: ahora el trabajo se hace en la ficha de la orden.
+     * Con ?cita=ID abre esa ficha; sin ella, regresa a Mis órdenes.
+     */
     public function create(Request $request)
     {
-        $appointments = Appointment::with(['client.user', 'vehicle'])
-            ->where('mechanic_id', auth()->id())
-            ->whereIn('status', [
-                'pendiente',
-                'diagnostico',
-                'en_proceso',
-            ])
-            ->orderBy('appointment_date')
-            ->orderBy('appointment_time')
-            ->get();
-
-        $selectedAppointment = null;
-
         if ($request->filled('cita')) {
-            $selectedAppointment = $appointments->firstWhere(
-                'id',
-                (int) $request->query('cita')
-            );
-
-            abort_unless($selectedAppointment, 404);
+            return redirect()->route('mecanico.ordenes.ficha', (int) $request->query('cita'));
         }
 
-        return view('mecanico.ordenes.create', compact(
-            'appointments',
-            'selectedAppointment'
-        ));
+        return redirect()->route('mecanico.dashboard');
     }
 
     public function store(Request $request)
@@ -68,7 +52,7 @@ class MechanicIntakeController extends Controller
 
         if ($appointment->intake_registered_at !== null) {
             return redirect()
-                ->route('mecanico.ordenes.create', ['cita' => $appointment->id])
+                ->route('mecanico.ordenes.ficha', $appointment)
                 ->with('error', 'El ingreso de esta cita ya fue registrado.');
         }
 
@@ -109,7 +93,24 @@ class MechanicIntakeController extends Controller
                 }
 
                 $locked->intake_registered_at = now();
+
+                // El vehículo ya está en el taller: pasa a diagnóstico.
+                $previousStatus = $locked->status;
+                if ($previousStatus === 'pendiente') {
+                    $locked->status = 'diagnostico';
+                }
+
                 $locked->save();
+
+                MechanicStatusLog::create([
+                    'appointment_id' => $locked->id,
+                    'mechanic_id' => auth()->id(),
+                    'previous_status' => $previousStatus,
+                    'new_status' => $locked->status,
+                    'note' => 'Ingreso del vehículo registrado ('
+                        . number_format($data['intake_mileage']) . ' km, combustible '
+                        . $data['intake_fuel_level'] . ').',
+                ]);
             });
         } catch (\Throwable $e) {
             foreach ($uploadedPaths as $path) {
@@ -119,8 +120,9 @@ class MechanicIntakeController extends Controller
             throw $e;
         }
 
+        // Siguiente paso natural: capturar diagnóstico y presupuesto.
         return redirect()
-            ->route('mecanico.ordenes.create', ['cita' => $appointment->id])
-            ->with('success', 'Ingreso del vehículo registrado correctamente.');
+            ->route('mecanico.ordenes.ficha', $appointment)
+            ->with('success', 'Ingreso registrado. Ahora captura el diagnóstico y el presupuesto.');
     }
 }

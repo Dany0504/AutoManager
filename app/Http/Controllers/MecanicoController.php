@@ -11,9 +11,14 @@ class MecanicoController extends Controller
     /**
      * Dashboard principal del mecánico.
      */
-    public function index()
+    public function index(Request $request)
     {
         $mechanicId = Auth::id();
+
+        // activas (por defecto) | hoy | todas
+        $filtro = in_array($request->query('filtro'), ['activas', 'hoy', 'todas'], true)
+            ? $request->query('filtro')
+            : 'activas';
 
         $appointments = Appointment::with([
             'client',
@@ -43,6 +48,23 @@ class MecanicoController extends Controller
             ->where('status', 'listo')
             ->count();
 
+        // Las estadísticas usan todas las citas; la tabla, solo las del filtro.
+        $activas = $appointments->reject(
+            fn ($cita) => in_array($cita->status, Appointment::FINISHED_STATUSES, true)
+        );
+
+        $conteoFiltros = [
+            'activas' => $activas->count(),
+            'hoy' => $activas->filter(fn ($cita) => $cita->appointment_date?->isToday())->count(),
+            'todas' => $appointments->count(),
+        ];
+
+        $appointments = match ($filtro) {
+            'hoy' => $activas->filter(fn ($cita) => $cita->appointment_date?->isToday())->values(),
+            'todas' => $appointments,
+            default => $activas->values(),
+        };
+
         return view(
             'mecanico.dashboard',
             compact(
@@ -50,64 +72,18 @@ class MecanicoController extends Controller
                 'totalCitas',
                 'pendientes',
                 'enProceso',
-                'listas'
+                'listas',
+                'filtro',
+                'conteoFiltros'
             )
         );
     }
 
     /**
-     * Mostrar cita del mecánico.
-     *
-     * Ya no cambiamos automáticamente
-     * el estado al abrir la cita.
+     * Enlace anterior a una cita: ahora abre su ficha única.
      */
     public function show(Appointment $cita)
     {
-        abort_unless(
-            (int) $cita->mechanic_id === (int) Auth::id(),
-            403
-        );
-
-        $cita->load([
-            'client',
-            'vehicle',
-        ]);
-
-        return view(
-            'mecanico.orden',
-            compact('cita')
-        );
-    }
-
-    /**
-     * Compatibilidad con el formulario anterior.
-     *
-     * La captura de diagnósticos y presupuestos
-     * ahora se realiza desde Detalle de orden.
-     */
-    public function updateDiagnosis(
-        Request $request,
-        Appointment $cita
-    ) {
-        abort_unless(
-            (int) $cita->mechanic_id === (int) Auth::id(),
-            403
-        );
-
-        abort_unless(
-            $cita->intake_registered_at !== null,
-            403,
-            'Primero debes registrar el ingreso del vehículo.'
-        );
-
-        return redirect()
-            ->route(
-                'mecanico.ordenes.detalle',
-                ['cita' => $cita->id]
-            )
-            ->with(
-                'error',
-                'Ahora debes guardar el diagnóstico y los conceptos desde Detalle de orden.'
-            );
+        return redirect()->route('mecanico.ordenes.ficha', $cita);
     }
 }

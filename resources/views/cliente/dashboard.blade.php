@@ -151,7 +151,7 @@
 
         .stats{
             display:grid;
-            grid-template-columns:repeat(3, 1fr);
+            grid-template-columns:repeat(4, 1fr);
             gap:16px;
             margin-bottom:22px;
         }
@@ -195,6 +195,144 @@
 
         .section-body{
             padding:20px 22px;
+        }
+
+
+        /* AVISOS (mensajes y autorizaciones pendientes) */
+        .flash{
+            padding:12px 16px;
+            margin-bottom:18px;
+            border:1px solid #bbf7d0;
+            background:#dcfce7;
+            color:#166534;
+            font-size:14px;
+        }
+
+        .card.alert{
+            border-color:#e11d2e;
+            box-shadow:inset 4px 0 0 #e11d2e;
+        }
+
+        .card a.card-link{
+            display:inline-block;
+            margin-top:6px;
+            color:#e11d2e;
+            font-size:13px;
+            font-weight:bold;
+            text-decoration:none;
+        }
+
+        .pending{
+            border:2px solid #e11d2e;
+            background:#fff;
+            margin-bottom:22px;
+        }
+
+        .pending-header{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:14px 22px;
+            background:#e11d2e;
+            color:#fff;
+            font-weight:bold;
+            font-size:17px;
+        }
+
+        .pending-count{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            min-width:24px;
+            height:24px;
+            padding:0 7px;
+            border-radius:999px;
+            background:#fff;
+            color:#e11d2e;
+            font-size:13px;
+        }
+
+        .pending-item{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:20px;
+            padding:18px 22px;
+            border-bottom:1px solid #eee;
+        }
+
+        .pending-item:last-child{
+            border-bottom:0;
+        }
+
+        .pending-info h3{
+            font-size:16px;
+            margin-bottom:4px;
+        }
+
+        .pending-info p{
+            color:#666;
+            font-size:13px;
+            line-height:1.5;
+        }
+
+        .pending-total{
+            margin-top:8px;
+            font-size:20px;
+            font-weight:bold;
+            color:#111;
+        }
+
+        .pending-actions{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            flex-shrink:0;
+        }
+
+        .pending-actions form{
+            margin:0;
+        }
+
+        .pending-actions a,
+        .pending-actions button{
+            display:inline-block;
+            padding:11px 16px;
+            border:1px solid #111;
+            background:#fff;
+            color:#111;
+            font-family:inherit;
+            font-size:13px;
+            font-weight:bold;
+            text-decoration:none;
+            cursor:pointer;
+        }
+
+        .pending-actions button.approve{
+            border-color:#e11d2e;
+            background:#e11d2e;
+            color:#fff;
+        }
+
+        .pending-actions button.approve:hover{
+            background:#c41223;
+        }
+
+        @media(max-width:700px){
+            .pending-item{
+                flex-direction:column;
+                align-items:stretch;
+            }
+
+            .pending-actions > *{
+                flex:1;
+            }
+
+            .pending-actions a,
+            .pending-actions button{
+                width:100%;
+                text-align:center;
+            }
         }
 
         /* ORDEN ACTIVA */
@@ -314,7 +452,7 @@
 
         @media(max-width:1100px){
             .stats{
-                grid-template-columns:1fr;
+                grid-template-columns:repeat(2, 1fr);
             }
 
             .timeline-horizontal{
@@ -324,6 +462,12 @@
 
             .line{
                 display:none;
+            }
+        }
+
+        @media(max-width:560px){
+            .stats{
+                grid-template-columns:1fr;
             }
         }
 
@@ -360,48 +504,8 @@
             </div>
 
             <nav class="menu">
-
-    <a href="{{ route('cliente.dashboard') }}"
-       class="{{ request()->routeIs('cliente.dashboard') ? 'active' : '' }}">
-        Inicio
-    </a>
-
-    <a href="{{ route('cliente.vehiculos') }}"
-       class="{{ request()->routeIs('cliente.vehiculos*') ? 'active' : '' }}">
-        Mis vehículos
-    </a>
-
-    <a href="{{ route('cliente.citas.create') }}"
-       class="{{ request()->routeIs('cliente.citas.create') ? 'active' : '' }}">
-        Agendar cita
-    </a>
-
-    <a href="{{ route('cliente.citas.index') }}"
-       class="{{ request()->routeIs('cliente.citas.*') && !request()->routeIs('cliente.citas.create') ? 'active' : '' }}">
-        Mis citas
-    </a>
-
-    <a href="{{ route('cliente.rastrear-orden') }}"
-       class="{{ request()->routeIs('cliente.rastrear-orden') ? 'active' : '' }}">
-        Rastrear orden
-    </a>
-
-    <a href="{{ route('cliente.historial') }}"
-       class="{{ request()->routeIs('cliente.historial') ? 'active' : '' }}">
-        Historial
-    </a>
-
-    <a href="{{ route('cliente.autorizaciones') }}"
-       class="{{ request()->routeIs('cliente.autorizaciones*') ? 'active' : '' }}">
-        Autorizaciones
-    </a>
-
-    <a href="{{ route('profile.edit') }}"
-       class="{{ request()->routeIs('profile.edit') ? 'active' : '' }}">
-        Perfil
-    </a>
-
-</nav>
+            @include('cliente.partials.menu')
+        </nav>
 
         </div>
 
@@ -426,6 +530,60 @@
 
         <div class="content">
 
+            @if(session('success'))
+                <div class="flash">{{ session('success') }}</div>
+            @endif
+
+            {{-- PRESUPUESTOS POR AUTORIZAR (visibles desde el inicio) --}}
+            @if($pendingAuthorizationsList->isNotEmpty())
+                <section class="pending" id="autorizaciones-pendientes">
+                    <div class="pending-header">
+                        <span class="pending-count">{{ $pendingAuthorizationsList->count() }}</span>
+                        {{ $pendingAuthorizationsList->count() === 1 ? 'Tienes un presupuesto por autorizar' : 'Tienes presupuestos por autorizar' }}
+                    </div>
+
+                    @foreach($pendingAuthorizationsList as $pendiente)
+                        @php $total = number_format((float) $pendiente->estimated_cost, 2); @endphp
+
+                        <div class="pending-item">
+                            <div class="pending-info">
+                                <h3>
+                                    {{ $pendiente->vehicle?->brand }} {{ $pendiente->vehicle?->model }} {{ $pendiente->vehicle?->year }}
+                                    · {{ $pendiente->folio }}
+                                </h3>
+                                <p>{{ \Illuminate\Support\Str::limit($pendiente->diagnosis, 160) }}</p>
+                                <p>{{ $pendiente->orderItems->count() }} concepto(s)</p>
+                                <div class="pending-total">${{ $total }} MXN</div>
+                            </div>
+
+                            <div class="pending-actions">
+                                <a href="{{ route('cliente.autorizaciones') }}">Ver detalle</a>
+
+                                <form
+                                    action="{{ route('cliente.autorizaciones.reject', $pendiente) }}"
+                                    method="POST"
+                                    onsubmit="return confirm('¿Estás seguro de rechazar esta reparación?')"
+                                >
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit">Rechazar</button>
+                                </form>
+
+                                <form
+                                    action="{{ route('cliente.autorizaciones.approve', $pendiente) }}"
+                                    method="POST"
+                                    onsubmit="return confirm('¿Deseas autorizar esta reparación por ${{ $total }} MXN?')"
+                                >
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="approve">Autorizar</button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                </section>
+            @endif
+
             <div class="stats">
                 <div class="card">
                     <small>Vehículos registrados</small>
@@ -449,6 +607,16 @@
                         {{ $activeOrder?->folio ?? 'Sin orden' }}
                     </h2>
                 </div>
+
+                <div class="card {{ $pendingAuthorizationsList->isNotEmpty() ? 'alert' : '' }}">
+                    <small>Autorizaciones pendientes</small>
+                    <h2 class="{{ $pendingAuthorizationsList->isNotEmpty() ? 'red' : '' }}">
+                        {{ $pendingAuthorizationsList->count() }}
+                    </h2>
+                    @if($pendingAuthorizationsList->isNotEmpty())
+                        <a class="card-link" href="#autorizaciones-pendientes">Revisar ahora ↑</a>
+                    @endif
+                </div>
             </div>
 
             <div class="section">
@@ -464,43 +632,40 @@
         </div>
     </div>
 
+    @php
+        // Etapas que ve el cliente y en cuál va su orden.
+        $etapas = [
+            'Recepción' => ['pendiente'],
+            'Diagnóstico' => ['diagnostico', 'esperando_aprobacion'],
+            'En proceso' => ['en_proceso'],
+            'Control calidad' => ['control_calidad'],
+            'Entrega' => ['listo'],
+        ];
+        $actual = 0;
+        foreach (array_values($etapas) as $i => $estados) {
+            if (in_array($activeOrder->status, $estados, true)) {
+                $actual = $i;
+            }
+        }
+    @endphp
+
+    <p style="color:#666; margin-bottom:6px;">
+        {{ $activeOrder->vehicle?->brand }} {{ $activeOrder->vehicle?->model }}
+        · Estado: <strong>{{ $activeOrder->status_label }}</strong>
+    </p>
+
     <div class="timeline-horizontal">
+        @foreach(array_keys($etapas) as $i => $etapa)
+            @if($i > 0)
+                <div class="line {{ $i <= $actual ? 'completed' : '' }}"></div>
+            @endif
 
-        {{-- Por ahora "pendiente" corresponde a Recepción --}}
-        <div class="step current">
-            <div class="circle">•</div>
-            <span>Recepción</span>
-        </div>
-
-                <div class="line"></div>
-
-                <div class="step">
-                    <div class="circle"></div>
-                    <span>Diagnóstico</span>
-                </div>
-
-                <div class="line"></div>
-
-                <div class="step">
-                    <div class="circle"></div>
-                    <span>En proceso</span>
-                </div>
-
-                <div class="line"></div>
-
-                <div class="step">
-                    <div class="circle"></div>
-                    <span>Control calidad</span>
-                </div>
-
-                <div class="line"></div>
-
-                <div class="step">
-                    <div class="circle"></div>
-                    <span>Entrega</span>
-                </div>
-
+            <div class="step {{ $i < $actual ? 'completed' : '' }} {{ $i === $actual ? 'current' : '' }}">
+                <div class="circle">{{ $i < $actual ? '✓' : ($i === $actual ? '•' : '') }}</div>
+                <span>{{ $etapa }}</span>
             </div>
+        @endforeach
+    </div>
 
         @else
 

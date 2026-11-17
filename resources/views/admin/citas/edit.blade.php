@@ -330,7 +330,7 @@
         }
 
         .field textarea {
-            resize: vertical;
+            resize: none;
 
             min-height: 120px;
         }
@@ -880,7 +880,8 @@
 
                                 <select
                                     id="clientSelect"
-                                    name="client_id">
+                                    name="client_id"
+                                    required>
 
                                     @foreach($clients as $client)
 
@@ -949,7 +950,8 @@
 
                                 <select
                                     id="vehicleSelect"
-                                    name="vehicle_id">
+                                    name="vehicle_id"
+                                    required>
 
                                     <option value="">
                                         Selecciona un vehículo
@@ -1035,7 +1037,8 @@
 
                                 <select
                                     id="service_type"
-                                    name="service_type">
+                                    name="service_type"
+                                    required>
 
                                     <option
                                         value="Mantenimiento general"
@@ -1155,7 +1158,8 @@
                                     type="date"
                                     id="appointment_date"
                                     name="appointment_date"
-                                    value="{{ old('appointment_date', $cita->appointment_date) }}">
+                                    value="{{ old('appointment_date', $cita->appointment_date) }}"
+                                    required>
 
                             </div>
 
@@ -1170,7 +1174,8 @@
                                     type="time"
                                     id="appointment_time"
                                     name="appointment_time"
-                                    value="{{ old('appointment_time', substr($cita->appointment_time, 0, 5)) }}">
+                                    value="{{ old('appointment_time', substr($cita->appointment_time, 0, 5)) }}"
+                                    required>
 
                             </div>
 
@@ -1286,7 +1291,8 @@
                 <input
                     type="hidden"
                     id="vehicleClientId"
-                    name="client_id">
+                    name="client_id"
+                    required>
 
 
                 <div class="grid-2">
@@ -1820,6 +1826,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </script>
 
+
+@include('partials.campos-obligatorios')
 </body>
 
 </html>

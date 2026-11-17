@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\MechanicOrderItem;
+use App\Models\MechanicStatusLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,58 +13,24 @@ use Illuminate\Validation\ValidationException;
 class MechanicOrderDetailController extends Controller
 {
     /**
-     * Mostrar únicamente citas asignadas
-     * que ya tengan ingreso registrado.
+     * Pantalla anterior: ahora el trabajo se hace en la ficha de la orden.
+     * Con ?cita=ID abre esa ficha; sin ella, regresa a Mis órdenes.
      */
     public function index(Request $request)
     {
-        $appointments = Appointment::with([
-            'client.user',
-            'vehicle',
-        ])
-            ->where('mechanic_id', Auth::id())
-            ->whereNotNull('intake_registered_at')
-            ->orderByDesc('appointment_date')
-            ->orderByDesc('appointment_time')
-            ->get();
-
-        $cita = null;
-
         if ($request->filled('cita')) {
-            $cita = Appointment::with([
-                'client.user',
-                'vehicle',
-            ])
-                ->where('mechanic_id', Auth::id())
-                ->whereNotNull('intake_registered_at')
-                ->findOrFail($request->query('cita'));
+            return redirect()->route('mecanico.ordenes.ficha', (int) $request->query('cita'));
         }
 
-        if (!$cita && $appointments->isNotEmpty()) {
-            $cita = $appointments->first();
-        }
-
-        if ($cita) {
-            $cita->load('orderItems');
-        }
-
-        return view('mecanico.ordenes.detalle', compact(
-            'appointments',
-            'cita'
-        ));
+        return redirect()->route('mecanico.dashboard');
     }
 
     /**
-     * Acceso directo a una cita.
+     * Enlace anterior a una cita: abre su ficha.
      */
     public function show(Appointment $cita)
     {
-        $this->validateAccess($cita);
-
-        return redirect()->route(
-            'mecanico.ordenes.detalle',
-            ['cita' => $cita->id]
-        );
+        return redirect()->route('mecanico.ordenes.ficha', $cita);
     }
 
     /**
@@ -174,6 +141,7 @@ class MechanicOrderDetailController extends Controller
             }
 
             $isSubmit = $validated['action'] === 'submit';
+            $previousStatus = $lockedCita->status;
 
             $lockedCita->update([
                 'diagnosis' => $validated['diagnosis'],
@@ -186,18 +154,31 @@ class MechanicOrderDetailController extends Controller
                 'status' => $isSubmit
                     ? 'esperando_aprobacion'
                     : 'diagnostico',
-                'authorization_status' => 'pendiente',
+                // Al guardar un borrador se conserva un rechazo previo
+                // para que el mecánico siga viendo el aviso.
+                'authorization_status' => $isSubmit
+                    ? 'pendiente'
+                    : $lockedCita->authorization_status,
                 'diagnosis_submitted_at' => $isSubmit
                     ? now()
                     : null,
             ]);
+
+            if ($isSubmit) {
+                MechanicStatusLog::create([
+                    'appointment_id' => $lockedCita->id,
+                    'mechanic_id' => Auth::id(),
+                    'previous_status' => $previousStatus,
+                    'new_status' => 'esperando_aprobacion',
+                    'note' => 'Presupuesto enviado al cliente por $'
+                        . number_format($totalCents / 100, 2)
+                        . ' (' . count($items) . ' concepto(s)).',
+                ]);
+            }
         });
 
         return redirect()
-            ->route(
-                'mecanico.ordenes.detalle',
-                ['cita' => $cita->id]
-            )
+            ->route('mecanico.ordenes.ficha', $cita)
             ->with(
                 'success',
                 $validated['action'] === 'submit'

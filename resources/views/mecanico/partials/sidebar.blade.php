@@ -6,7 +6,7 @@
         : null;
 @endphp
 
-<aside class="mechanic-sidebar">
+<aside class="mechanic-sidebar" id="mechanicSidebar">
 
     <div class="mechanic-sidebar-header">
         <div class="mechanic-sidebar-logo">
@@ -22,64 +22,88 @@
                 Mecánico
             </div>
         </div>
+
+        {{-- Solo visible en celular: abre y cierra el menú --}}
+        <button
+            type="button"
+            class="mechanic-menu-toggle"
+            id="mechanicMenuToggle"
+            aria-controls="mechanicSidebarPanel"
+            aria-expanded="false"
+            aria-label="Abrir menú"
+        >
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </div>
 
-    <nav class="mechanic-sidebar-menu">
+    <div class="mechanic-sidebar-panel" id="mechanicSidebarPanel">
 
-        <a
-            href="{{ route('mecanico.dashboard') }}"
-            class="{{ $mechanicCurrentRoute === 'mecanico.dashboard' || str_starts_with($mechanicCurrentRoute ?? '', 'mecanico.citas.') ? 'active' : '' }}"
-        >
-            Mis citas
-        </a>
+        <nav class="mechanic-sidebar-menu">
 
-        <a
-            href="{{ route('mecanico.ordenes.create') }}"
-            class="{{ in_array($mechanicCurrentRoute, ['mecanico.ordenes.create', 'mecanico.ordenes.store'], true) ? 'active' : '' }}"
-        >
-            Ingreso de órdenes
-        </a>
-
-        <a
-            href="{{ route('mecanico.ordenes.detalle') }}"
-            class="{{ str_starts_with($mechanicCurrentRoute ?? '', 'mecanico.ordenes.detalle') ? 'active' : '' }}"
-        >
-            Detalle de órdenes
-        </a>
-
-        <a
-            href="{{ route('mecanico.ordenes.estatus') }}"
-            class="{{ str_starts_with($mechanicCurrentRoute ?? '', 'mecanico.ordenes.estatus') ? 'active' : '' }}"
-        >
-            Cambio de estatus
-        </a>
-
-    </nav>
-
-    <div class="mechanic-sidebar-footer">
-
-        <div class="mechanic-session-label">
-            Sesión activa
-        </div>
-
-        <div class="mechanic-session-name">
-            {{ auth()->user()?->name ?? 'Mecánico' }}
-        </div>
-
-        @if($mechanicProfileRoute)
-            <a href="{{ route($mechanicProfileRoute) }}">
-                Perfil
+            <a
+                href="{{ route('mecanico.dashboard') }}"
+                class="{{ $mechanicCurrentRoute === 'mecanico.dashboard' || str_starts_with($mechanicCurrentRoute ?? '', 'mecanico.ordenes.') ? 'active' : '' }}"
+            >
+                Mis órdenes
             </a>
-        @endif
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
+        </nav>
 
-            <button type="submit">
-                ← Cerrar sesión
-            </button>
-        </form>
+        <div class="mechanic-sidebar-footer">
+
+            <div class="mechanic-session-label">
+                Sesión activa
+            </div>
+
+            <div class="mechanic-session-name">
+                {{ auth()->user()?->name ?? 'Mecánico' }}
+            </div>
+
+            @if($mechanicProfileRoute)
+                <a href="{{ route($mechanicProfileRoute) }}">
+                    Perfil
+                </a>
+            @endif
+
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+
+                <button type="submit">
+                    ← Cerrar sesión
+                </button>
+            </form>
+
+        </div>
 
     </div>
 
 </aside>
+
+<script>
+    (function () {
+        var sidebar = document.getElementById('mechanicSidebar');
+        var toggle = document.getElementById('mechanicMenuToggle');
+        if (!sidebar || !toggle) return;
+
+        function setOpen(open) {
+            sidebar.classList.toggle('open', open);
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+        }
+
+        toggle.addEventListener('click', function () {
+            setOpen(!sidebar.classList.contains('open'));
+        });
+
+        // Cerrar al tocar fuera del menú o con la tecla Escape
+        document.addEventListener('click', function (e) {
+            if (sidebar.classList.contains('open') && !sidebar.contains(e.target)) setOpen(false);
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') setOpen(false);
+        });
+    })();
+</script>

@@ -85,6 +85,49 @@ body {
     margin-top: 4px;
 }
 
+/* Menú y pie del lateral (en celular se esconden tras el botón ☰) */
+.mechanic-sidebar-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.mechanic-menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 42px;
+    height: 42px;
+    margin-left: auto;
+    padding: 0 10px;
+    border: 1px solid #333333;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.mechanic-menu-toggle span {
+    display: block;
+    height: 2px;
+    border-radius: 2px;
+    background: #ffffff;
+    transition: transform .2s ease, opacity .2s ease;
+}
+
+.mechanic-sidebar.open .mechanic-menu-toggle span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.mechanic-sidebar.open .mechanic-menu-toggle span:nth-child(2) {
+    opacity: 0;
+}
+
+.mechanic-sidebar.open .mechanic-menu-toggle span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
 .mechanic-sidebar-menu {
     flex: 1;
     padding-top: 8px;
@@ -248,7 +291,7 @@ body {
 
 .mechanic-form-group textarea {
     min-height: 100px;
-    resize: vertical;
+    resize: none;
 }
 
 .mechanic-form-group input:focus,
@@ -494,13 +537,43 @@ body {
    ========================================== */
 
 @media (max-width: 768px) {
+    /* En celular el menú lateral se vuelve una barra superior fija
+       con botón de tres rayas que despliega las opciones. */
     .mechanic-sidebar {
-        position: relative;
-        top: auto;
+        position: sticky;
+        top: 0;
         left: auto;
         width: 100%;
         height: auto;
         min-height: auto;
+        overflow: visible;
+    }
+
+    .mechanic-sidebar-header {
+        min-height: 60px;
+        padding: 10px 14px;
+        border-bottom: 0;
+    }
+
+    .mechanic-menu-toggle {
+        display: inline-flex;
+    }
+
+    .mechanic-sidebar-panel {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+        background: var(--mechanic-black);
+        border-top: 1px solid #222222;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, .35);
+    }
+
+    .mechanic-sidebar.open .mechanic-sidebar-panel {
+        display: flex;
     }
 
     .mechanic-sidebar-menu {
@@ -623,7 +696,7 @@ body {
 
     .mechanic-intake-field textarea {
         min-height: 110px;
-        resize: vertical;
+        resize: none;
     }
 
     .mechanic-intake-field input:focus,
@@ -867,7 +940,7 @@ body {
 
     .mechanic-detail-field textarea {
         min-height: 145px;
-        resize: vertical;
+        resize: none;
     }
 
     .mechanic-detail-field select:focus,
@@ -1146,7 +1219,7 @@ body {
 
     .mechanic-status-field textarea {
         min-height: 110px;
-        resize: vertical;
+        resize: none;
     }
 
     .mechanic-status-field select:focus,
@@ -1374,3 +1447,374 @@ body {
         outline-offset: 2px;
     }
 
+
+/* ===== Evitar que el usuario redimensione campos de texto ===== */
+textarea {
+    resize: none;
+}
+
+/* ===== Mis citas - filtros (Activas / Hoy / Todas) ===== */
+.mechanic-dashboard-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.mechanic-dashboard-filters a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border: 1px solid var(--mechanic-border, #e5e5e5);
+    border-radius: 999px;
+    color: #333333;
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none;
+    background: #ffffff;
+}
+
+.mechanic-dashboard-filters a span {
+    min-width: 22px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: #f1f1f1;
+    color: #555555;
+    font-size: 12px;
+    text-align: center;
+}
+
+.mechanic-dashboard-filters a:hover {
+    border-color: #e11d2e;
+}
+
+.mechanic-dashboard-filters a.active {
+    background: #e11d2e;
+    border-color: #e11d2e;
+    color: #ffffff;
+}
+
+.mechanic-dashboard-filters a.active span {
+    background: rgba(255, 255, 255, .25);
+    color: #ffffff;
+}
+
+/* ==========================================
+   FICHA ÚNICA DE ORDEN
+   Ingreso → Diagnóstico y presupuesto → Reparación → Entrega
+   ========================================== */
+
+.mechanic-order {
+    width: 100%;
+    max-width: 1150px;
+    margin: 0 auto;
+}
+
+/* Dentro de la ficha, los contenedores de cada paso usan el ancho de la ficha */
+.mechanic-order .mechanic-intake-container,
+.mechanic-order .mechanic-detail-container,
+.mechanic-order .mechanic-status-container {
+    max-width: none;
+}
+
+.mechanic-order .mechanic-intake-card {
+    margin-bottom: 22px;
+}
+
+/* Encabezado */
+
+.mechanic-order-header {
+    padding-bottom: 20px;
+}
+
+.mechanic-order-back {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: #777777;
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.mechanic-order-back:hover {
+    color: var(--mechanic-red);
+}
+
+.mechanic-order-title {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.mechanic-order-facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px 24px;
+    margin: 18px 0 0;
+}
+
+.mechanic-order-facts div {
+    min-width: 0;
+}
+
+.mechanic-order-facts dt {
+    margin-bottom: 4px;
+    color: #888888;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+}
+
+.mechanic-order-facts dd {
+    margin: 0;
+    color: #222222;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.mechanic-order-facts a {
+    color: var(--mechanic-red);
+    text-decoration: none;
+}
+
+/* Barra de pasos */
+
+.mechanic-order-steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.mechanic-order-steps > a,
+.mechanic-order-steps > span {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    padding: 14px;
+    background: #ffffff;
+    border: 1px solid var(--mechanic-border);
+    border-radius: 10px;
+    color: #222222;
+    text-decoration: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+.mechanic-order-steps > a:hover {
+    border-color: #bbbbbb;
+}
+
+.mechanic-order-steps .locked {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.mechanic-order-steps .selected {
+    border-color: var(--mechanic-red);
+    box-shadow: 0 0 0 3px rgba(225, 29, 46, .12);
+}
+
+.mechanic-order-step-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border: 2px solid #dddddd;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #999999;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.mechanic-order-steps .done .mechanic-order-step-marker {
+    background: #111111;
+    border-color: #111111;
+    color: #ffffff;
+}
+
+.mechanic-order-steps .current .mechanic-order-step-marker {
+    background: var(--mechanic-red);
+    border-color: var(--mechanic-red);
+    color: #ffffff;
+}
+
+.mechanic-order-step-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.mechanic-order-step-text strong {
+    font-size: 14px;
+}
+
+.mechanic-order-step-text small {
+    margin-top: 3px;
+    color: #888888;
+    font-size: 12px;
+}
+
+/* Avisos */
+
+.mechanic-order-viewing,
+.mechanic-order-waiting {
+    margin-bottom: 20px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.mechanic-order-viewing {
+    background: #f1f1f1;
+    color: #444444;
+}
+
+.mechanic-order-viewing a {
+    color: var(--mechanic-red);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.mechanic-order-waiting {
+    border: 1px solid #c9dcf5;
+    background: #eef5ff;
+    color: #1f4e8c;
+}
+
+.mechanic-order-text {
+    margin: 0 0 18px;
+    color: #555555;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Entrega */
+
+.mechanic-order-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.mechanic-order-summary div {
+    flex: 1 1 160px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: #f7f7f7;
+}
+
+.mechanic-order-summary span {
+    display: block;
+    margin-bottom: 4px;
+    color: #777777;
+    font-size: 12px;
+}
+
+.mechanic-order-summary strong {
+    font-size: 20px;
+    color: #111111;
+}
+
+.mechanic-order-done {
+    text-align: center;
+}
+
+.mechanic-order-done-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 10px;
+    border-radius: 50%;
+    background: #111111;
+    color: #ffffff;
+    font-size: 24px;
+}
+
+/* Historial */
+
+.mechanic-order-note {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.mechanic-order-note .mechanic-status-field {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.mechanic-order-note textarea {
+    min-height: 0;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+    .mechanic-order-steps {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .mechanic-order-facts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .mechanic-order-steps {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .mechanic-order-steps > a,
+    .mechanic-order-steps > span {
+        flex-direction: column;
+        gap: 6px;
+        padding: 10px 4px;
+        text-align: center;
+    }
+
+    .mechanic-order-step-text small {
+        display: none;
+    }
+
+    .mechanic-order-step-text strong {
+        font-size: 11px;
+        line-height: 1.25;
+    }
+
+    .mechanic-order-title {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .mechanic-order-note {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* Acción secundaria en Mis órdenes (esperando cliente / orden cerrada) */
+.mechanic-action-link.secondary {
+    background: #f1f1f1;
+    color: #444444;
+}
+
+.mechanic-action-link.secondary:hover {
+    background: #e4e4e4;
+    color: #111111;
+}

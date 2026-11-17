@@ -20,39 +20,17 @@ class MechanicStatusController extends Controller
         'listo',
     ];
 
+    /**
+     * Pantalla anterior: ahora el trabajo se hace en la ficha de la orden.
+     * Con ?cita=ID abre esa ficha; sin ella, regresa a Mis órdenes.
+     */
     public function index(Request $request)
     {
-        $appointments = Appointment::with(['client.user', 'vehicle'])
-            ->where('mechanic_id', Auth::id())
-            ->whereNotNull('intake_registered_at')
-            ->orderByDesc('appointment_date')
-            ->orderByDesc('appointment_time')
-            ->get();
-
-        $cita = null;
-
         if ($request->filled('cita')) {
-            $cita = Appointment::with(['client.user', 'vehicle'])
-                ->where('mechanic_id', Auth::id())
-                ->whereNotNull('intake_registered_at')
-                ->findOrFail($request->query('cita'));
-        } elseif ($appointments->isNotEmpty()) {
-            $cita = $appointments->first();
+            return redirect()->route('mecanico.ordenes.ficha', (int) $request->query('cita'));
         }
 
-        $logs = $cita
-            ? MechanicStatusLog::where('appointment_id', $cita->id)
-                ->with('mechanic')
-                ->orderByDesc('created_at')
-                ->orderByDesc('id')
-                ->get()
-            : collect();
-
-        return view('mecanico.ordenes.estatus', compact(
-            'appointments',
-            'cita',
-            'logs'
-        ));
+        return redirect()->route('mecanico.dashboard');
     }
 
     public function update(Request $request, Appointment $cita)
@@ -162,9 +140,7 @@ class MechanicStatusController extends Controller
         });
 
         return redirect()
-            ->route('mecanico.ordenes.estatus', [
-                'cita' => $cita->id,
-            ])
+            ->route('mecanico.ordenes.ficha', $cita)
             ->with('success', $message);
     }
 }

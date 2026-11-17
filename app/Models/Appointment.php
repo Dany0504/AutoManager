@@ -6,6 +6,46 @@ use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
+    /**
+     * Nombre visible de cada estado de la orden.
+     * Úsalo en las vistas con $cita->status_label
+     * o Appointment::statusLabel($estado).
+     */
+    public const STATUS_LABELS = [
+        'pendiente' => 'Pendiente',
+        'diagnostico' => 'Diagnóstico',
+        'esperando_aprobacion' => 'Esperando autorización',
+        'en_proceso' => 'En proceso',
+        'control_calidad' => 'Control de calidad',
+        'listo' => 'Listo para entrega',
+        'entregado' => 'Entregado',
+        'rechazado' => 'Rechazado',
+        'completado' => 'Completado',
+        'cancelado' => 'Cancelado',
+    ];
+
+    /**
+     * Estados de una orden terminada: ya no requiere trabajo del mecánico,
+     * sale de "Rastrear orden" y pasa al historial del cliente.
+     * El flujo del mecánico cierra las órdenes con "entregado".
+     */
+    public const FINISHED_STATUSES = ['entregado', 'completado', 'cancelado'];
+
+    public static function statusLabel(?string $status): string
+    {
+        if ($status === null || $status === '') {
+            return 'Sin estado';
+        }
+
+        return self::STATUS_LABELS[$status]
+            ?? ucfirst(str_replace('_', ' ', $status));
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return self::statusLabel($this->status);
+    }
+
     protected $fillable = [
     'folio',
     'client_id',

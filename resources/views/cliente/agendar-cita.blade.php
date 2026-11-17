@@ -289,7 +289,7 @@
             padding: 12px;
             font-family: Arial, sans-serif;
             font-size: 14px;
-            resize: vertical;
+            resize: none;
             outline: none;
         }
 
@@ -498,48 +498,8 @@
 
 
 <nav class="menu">
-
-    <a href="{{ route('cliente.dashboard') }}"
-       class="{{ request()->routeIs('cliente.dashboard') ? 'active' : '' }}">
-        Inicio
-    </a>
-
-    <a href="{{ route('cliente.vehiculos') }}"
-       class="{{ request()->routeIs('cliente.vehiculos*') ? 'active' : '' }}">
-        Mis vehículos
-    </a>
-
-    <a href="{{ route('cliente.citas.create') }}"
-       class="{{ request()->routeIs('cliente.citas.create') ? 'active' : '' }}">
-        Agendar cita
-    </a>
-
-    <a href="{{ route('cliente.citas.index') }}"
-       class="{{ request()->routeIs('cliente.citas.*') && !request()->routeIs('cliente.citas.create') ? 'active' : '' }}">
-        Mis citas
-    </a>
-
-    <a href="{{ route('cliente.rastrear-orden') }}"
-       class="{{ request()->routeIs('cliente.rastrear-orden') ? 'active' : '' }}">
-        Rastrear orden
-    </a>
-
-    <a href="{{ route('cliente.historial') }}"
-       class="{{ request()->routeIs('cliente.historial') ? 'active' : '' }}">
-        Historial
-    </a>
-
-    <a href="{{ route('cliente.autorizaciones') }}"
-       class="{{ request()->routeIs('cliente.autorizaciones*') ? 'active' : '' }}">
-        Autorizaciones
-    </a>
-
-    <a href="{{ route('profile.edit') }}"
-       class="{{ request()->routeIs('profile.edit') ? 'active' : '' }}">
-        Perfil
-    </a>
-
-</nav>
+            @include('cliente.partials.menu')
+        </nav>
 
 
         <div class="session">
@@ -754,7 +714,7 @@
                     <div class="field">
 
                         <label>
-                            Tipo de servicio
+                            Tipo de servicio<span class="req-mark">*</span>
                         </label>
 
 
@@ -923,7 +883,7 @@
                     <div class="field">
 
                         <label>
-                            Horario disponible
+                            Horario disponible<span class="req-mark">*</span>
                         </label>
 
 
@@ -1274,5 +1234,7 @@
 
 </script>
 
+
+@include('partials.campos-obligatorios')
 </body>
 </html>
